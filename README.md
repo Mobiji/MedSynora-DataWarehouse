@@ -44,7 +44,7 @@ These insights empower stakeholders with key business metrics, enabling strategi
 
 Let's stay in touch! Feel free to connect with me on the following platforms:
 
-https://www.linkedin.com/in/djiby-amadou-b917a2231/
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/djiby-amadou-b917a2231/)
 
 ## **🛡️ License**
 
@@ -56,6 +56,6 @@ Hi there! I'm Djiby Amadou, an aspiring data professional and passionate potenti
 
 Let's stay in touch! Feel free to connect with me on the following platforms:
 
-https://www.linkedin.com/in/djiby-amadou-b917a2231/
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/djiby-amadou-b917a2231/)
 
 
