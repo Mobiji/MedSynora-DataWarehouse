@@ -1,1 +1,23 @@
+/*
+===========================================================================================================================================
+	CREATING SCHEMAS
+===========================================================================================================================================
+Script Purpose:
+	The following script goeas ahead to create the 3 relevant schemas 'msbronze', 'mssilver' & 'msgold' after checking if they already exist.
+    In the case they exist, the script will drop them first before attempting to create the new ones.
+    
+WARNING:
+	Running this script will drop the 3 entire schemas in context IF they already exist.
+    All prior data will be permanently deleted so proceed with caution and ensure you have proper backups set up prior to executing this script
+*/
 
+
+
+drop schema if exists msbronze;
+create schema msbronze;
+
+drop schema if exists mssilver;
+create schema mssilver;
+
+drop schema if exists msgold;
+create schema msgold;
