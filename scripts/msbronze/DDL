@@ -1,1 +1,290 @@
+/*
+=======================================================================================================================================================================
+		CREATING THE BRONZE TABLES
+=======================================================================================================================================================================
+Script Purpose:
+	* The following DDL script goes ahead to drop each individual table in the bronze layer ('msbronze') before re-creating them.
+    * Run this script in order to re-define the bronze layer if need be.
+=======================================================================================================================================================================
+*/
 
+
+
+use msbronze;
+
+-- ==========================================================================================
+drop table if exists erp_Bridgeencounteradditionalservice;
+create table erp_Bridgeencounteradditionalservice
+(
+	Encounter_ID int,
+	AdditionalServiceID int
+);
+-- ==========================================================================================
+
+drop table if exists erp_Bridgeencounterdoctor;
+create table erp_Bridgeencounterdoctor
+(
+	Encounter_ID int,
+	Doctor_ID int
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimAdditionalService;
+create table erp_DimAdditionalService
+(
+AdditionalServiceID int,
+ServiceName varchar(50)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimAllergy;
+create table erp_DimAllergy
+(
+	AllergyID int,
+	AllergyName varchar(50)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimChronicDisease;
+create table erp_DimChronicDisease
+(
+	ChronicDiseaseID int,
+	ChronicDiseaseName varchar(100)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimDate;
+create table erp_DimDate
+(
+	`Date` date,
+	DateKey int,
+	`Year` varchar(20),
+	`Month`int,
+	`day` int,
+	`quarter` int,
+	`weekday` int,
+	Date_String varchar(20)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimDisease;
+create table erp_DimDisease
+(
+	Disease_ID int,
+	`Admission Diagnosis` varchar(150),
+	`Disease Type` varchar(50),
+	`Disease Severity` int,
+	`Medical Unit` varchar(50)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimDoctor;
+create table erp_DimDoctor
+(
+	Doctor_ID int,
+	`Doctor Name` varchar(50),
+	`Doctor Surname` varchar(50),
+	`Doctor Title` varchar(30),
+	`Doctor Nationality` varchar(30),
+	`Medical Unit` varchar(50),
+	`Max Patient Count` int 
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimInsuranceDetails;
+create table erp_DimInsuranceDetails
+(
+	InsuranceKey int,
+	`Insurance Plan Name` varchar(30),
+	`Coverage Limit` decimal(4, 2),
+	Deductible int
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimInsurancePackages;
+create table erp_DimInsurancePackages
+(
+	`Conditions Partially Covered` varchar(200),
+	Basic varchar(30),
+	Standard varchar(30),
+	Premium varchar(30)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimPatient;
+create table erp_DimPatient
+(
+	Patient_ID varchar(20),
+	`First Name` varchar(30),
+	`Last Name` varchar(50),
+	Gender varchar(20),
+	`Birth Date` varchar(20),
+	Height int,
+	Weight int,
+	`Marital Status` varchar(10),
+	Nationality varchar(30),
+	`Blood Type` varchar(10)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimRoom;
+create table erp_DimRoom
+(
+	RoomKey int,
+	Care_Level varchar(30),
+	`Room Type` varchar(30)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimSpecialTest;
+create table erp_DimSpecialTest
+(
+	Encounter_ID int,
+	Test_ID int,
+	Test_Phase varchar(30),
+	Test_Name varchar(100),
+	Test_Result decimal (8, 2)
+);
+-- ==========================================================================================
+
+drop table if exists erp_DimTreatment;
+create table erp_DimTreatment
+(
+	Encounter_ID int,
+	Treatment_ID varchar(30),
+	Treatment_Type varchar(30),
+	Treatment_Name varchar(100),
+	Follow_Up varchar(10),
+	Complications varchar(10),
+	Drug_Boxes_Used int,
+	Therapy_Sessions int
+);
+-- ==========================================================================================
+
+drop table if exists erp_FactCost;
+create table erp_FactCost
+(
+	Encounter_ID int,
+	CostType varchar(40),
+	CostAmount varchar(40)
+);
+-- ==========================================================================================
+
+drop table if exists erp_FactEncounter;
+create table erp_FactEncounter
+(
+	Encounter_ID int,
+	Patient_ID varchar(30),
+	Disease_ID int,
+	ResponsibleDoctorID int,
+	InsuranceKey int,
+	RoomKey int,
+	CheckinDate varchar(50),
+	CheckoutDate varchar(50),
+	CheckinDateKey int,
+	CheckoutDateKey int,
+	Patient_Severity_Score decimal(6, 2),
+	RadiologyType varchar(30),
+	RadiologyProcedureCount int,
+	EndoscopyType varchar(50),
+	EndoscopyProcedureCount int,
+	CompanionPresent varchar(30)
+);
+-- ==========================================================================================
+
+drop table if exists erp_FactLabTests;
+create table erp_FactLabTests
+(
+	Encounter_ID int,
+	Patient_ID varchar(30),
+	`Phase` varchar(30),
+	LabType varchar(30),
+	TestName varchar(70),
+	TestValue varchar(10)
+);
+-- ==========================================================================================
+
+drop table if exists erp_FactSpecialTests;
+create table erp_FactSpecialTests
+(
+	SpecialTest_ID int,
+	Encounter_ID int,
+	Test_Phase varchar(30),
+	Test_Name varchar(150),
+	Test_Result decimal(10, 2)
+);
+
+drop table if exists erp_FactTreatment;
+create table erp_FactTreatment
+(
+	Encounter_ID int,
+	Treatment_ID int,
+	Treatment_Type varchar(30),
+	Treatment_Name varchar(100),
+	Follow_Up varchar(10),
+	Complications varchar(10),
+	Drug_Boxes_Used int,
+	Therapy_Sessions int,
+	Drug_Cost int,
+	Surgery_Cost int,
+	Post_Surgery_Care_Cost int,
+	Education_Rehab_Cost int,
+	Hospital_Drug_Quantity int,
+	Discharge_Drug_Quantity int,
+	Total_Drug_Quantity int
+);
+-- ==========================================================================================
+
+drop table if exists erp_FactTreatmentCost;
+create table erp_FactTreatmentCost
+(
+	Encounter_ID int,
+	Treatment_ID varchar(20),
+	Drug_Cost int,
+	Surgery_Cost int,
+	Post_Surgery_Care_Cost int,
+	Education_Rehab_Cost int,
+	Hospital_Drug_Quantity int,
+	Discharge_Drug_Quantity int,
+	Total_Drug_Quantity int
+);
+-- ==========================================================================================
+
+drop table if exists erp_FactVitals;
+create table erp_FactVitals
+(
+	Encounter_ID int,
+	Patient_ID varchar(20),
+	`Phase` varchar(40),
+	HeartRate decimal(4, 1),
+	Temperature decimal(4, 1),
+	SystolicBP int,
+	DiastolicBP int,
+	RespRate int,
+	O2Sat decimal(4, 1)
+);
+-- ==========================================================================================
+
+drop table if exists erp_Patient_AdditionalService;
+create table erp_Patient_AdditionalService
+(
+	Encounter_ID int,
+	AdditionalServiceID int
+);
+-- ==========================================================================================
+
+drop table if exists erp_Patient_Allergy;
+create table erp_Patient_Allergy
+(
+	Patient_ID varchar(20),
+	AllergyID int
+);
+-- ==========================================================================================
+
+drop table if exists erp_Patient_ChronicDisease;
+create table erp_Patient_ChronicDisease
+(
+	Patient_ID varchar(20),
+	ChronicDiseaseID int
+);
+-- =====================================================================================================================================================================
