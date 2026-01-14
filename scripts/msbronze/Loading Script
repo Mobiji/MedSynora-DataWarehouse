@@ -1,1 +1,325 @@
+/*
+=======================================================================================================================================================================
+		LOADING THE BRONZE LAYER
+=======================================================================================================================================================================
+Script Purpose:
+	* The following DML script goes ahead to truncate each individual table in the bronze layer ('msbronze') before re-populating them with fresh data.
+    * This fresh data comes from the various csv files in the source system (ERP).
+    * Highlight and run this whole script in order to refresh the bronze layer when need be.
+=======================================================================================================================================================================
+*/
 
+truncate table msbronze.erp_bridgeencounteradditionalservice;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/BridgeEncounterAdditionalService.csv'
+into table msbronze.erp_bridgeencounteradditionalservice
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_bridgeencounteradditionalservice;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_bridgeencounterdoctor;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/BridgeEncounterDoctor.csv'
+into table msbronze.erp_bridgeencounterdoctor
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_bridgeencounterdoctor;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimadditionalservice;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimAdditionalService.csv'
+into table msbronze.erp_dimadditionalservice
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimadditionalservice;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimallergy;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimAllergy.csv'
+into table msbronze.erp_dimallergy
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimallergy;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimchronicdisease;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimChronicDisease.csv'
+into table msbronze.erp_dimchronicdisease
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimchronicdisease;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimdate;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimDate.csv'
+into table msbronze.erp_dimdate
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimdate;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimdisease;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimDisease.csv'
+into table msbronze.erp_dimdisease
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimdisease;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimdoctor;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimDoctor.csv'
+into table msbronze.erp_dimdoctor
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimdoctor;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_diminsurancedetails;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimInsuranceDetails.csv'
+into table msbronze.erp_diminsurancedetails
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_diminsurancedetails;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_diminsurancepackages;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimInsurancePackages.csv'
+into table msbronze.erp_diminsurancepackages
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_diminsurancepackages;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimpatient;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimPatient.csv'
+into table msbronze.erp_dimpatient
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimpatient;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimroom;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimRoom.csv'
+into table msbronze.erp_dimroom
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimroom;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimspecialtest;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimSpecialTest.csv'
+into table msbronze.erp_dimspecialtest
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimspecialtest;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_dimtreatment;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/DimTreatment.csv'
+into table msbronze.erp_dimtreatment
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_dimtreatment;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_factcost;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/FactCost.csv'
+into table msbronze.erp_factcost
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_factcost;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_factencounter;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/FactEncounter.csv'
+into table msbronze.erp_factencounter
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_factencounter;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_FactLabTests;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/FactLabTests.csv'
+into table msbronze.erp_FactLabTests
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_FactLabTests;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_factspecialtests;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/FactSpecialTests.csv'
+into table msbronze.erp_factspecialtests
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_factspecialtests;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_facttreatment;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/FactTreatment.csv'
+into table msbronze.erp_facttreatment
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_facttreatment;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_facttreatmentcost;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/FactTreatmentCost.csv'
+into table msbronze.erp_facttreatmentcost
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_facttreatmentcost;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_factvitals;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/FactVitals.csv'
+into table msbronze.erp_factvitals
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_factvitals;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_patient_additionalservice;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/Patient_AdditionalService.csv'
+into table msbronze.erp_patient_additionalservice
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_patient_additionalservice;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_patient_allergy;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/Patient_Allergy.csv'
+into table msbronze.erp_patient_allergy
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_patient_allergy;
+/*
+=======================================================================================================================================================================
+*/
+
+truncate table msbronze.erp_patient_chronicdisease;
+load data local infile 'C:/Users/Lenovo x1/Desktop/MySQL/MySQL 2025/MedSynora/MedSynora DW/Raw_Unzipped/ERP/Patient_ChronicDisease.csv'
+into table msbronze.erp_patient_chronicdisease
+fields terminated by ','
+lines terminated by '\r\n'
+ignore 1 rows;
+
+select count(*)
+from msbronze.erp_patient_chronicdisease;
+
+select *
+from msbronze.erp_patient_chronicdisease;
+/*
+=======================================================================================================================================================================
+*/
