@@ -5,6 +5,9 @@
 Script Purpose:
 	* The following DDL script goes ahead to drop each individual table in the bronze layer ('msbronze') before re-creating them.
     * Run this script in order to re-define the bronze layer if need be.
+
+Warning !
+* You have to execute the 'use msbronze;' query first before attempting to refresh data in the silver layer just incase you are using a different schema.
 =======================================================================================================================================================================
 */
 
