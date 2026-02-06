@@ -166,15 +166,10 @@ create table erp_DimSpecialTest
 drop table if exists erp_DimTreatment;
 create table erp_DimTreatment
 (
-	Encounter_ID int,
-	Treatment_ID varchar(30),
+	Treatment_ID int,
 	Treatment_Type varchar(30),
 	Treatment_Name varchar(100),
-	Follow_Up varchar(10),
-	Complications varchar(10),
-	Drug_Boxes_Used int,
-	Therapy_Sessions int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
+	dwh_load_date date default (date_format(now(), '%D %b %Y'))
 );
 -- ==========================================================================================
 
