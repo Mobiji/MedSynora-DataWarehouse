@@ -177,8 +177,23 @@ drop table if exists erp_FactCost;
 create table erp_FactCost
 (
 	Encounter_ID int,
-	CostType varchar(40),
-	CostAmount varchar(40),
+    DrugCost decimal(10,2),
+    SurgeryCost decimal(10,2),
+    PostSurgeryCare decimal(10,2),
+    EducationRehab decimal(10,2),
+    PsychologicalSupport decimal(10,2),
+    RoomCost decimal(10,2),
+    CompanionAccommodation decimal(10,2),
+    NutritionCost decimal(10,2),
+    RadiologyCost decimal(10,2),
+    EndoscopyCost decimal(10,2),
+    AdditionalInsuranceFees decimal(10,2),
+    TotalCost decimal(10,2),
+    InsuranceCoverage decimal(10,2),
+    OutOfPocketCost decimal(10,2),
+    CBC_Cost decimal(10,2),
+    Chem_Cost decimal(10,2),
+    Lipid_Cost decimal(10,2),
     dwh_load_date date default (date_format(now(), '%D %b %Y'))
 );
 -- ==========================================================================================
