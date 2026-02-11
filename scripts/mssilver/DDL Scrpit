@@ -223,15 +223,92 @@ create table erp_FactEncounter
 );
 -- ==========================================================================================
 
-drop table if exists erp_FactLabTests;
-create table erp_FactLabTests
+drop table if exists erp_factlabtests_adm_child;
+create table erp_factlabtests_adm_child
 (
 	Encounter_ID int,
 	Patient_ID varchar(30),
-	`Phase` varchar(30),
-	LabType varchar(30),
-	TestName varchar(70),
-	TestValue varchar(10),
+	`Phase` varchar(50),
+    `RBC (10^6/µl) (CBC)` decimal(5, 2),
+	`Hemoglobin (g/dl) (CBC)` decimal(5, 1),
+    `Hematocrit (%) (CBC)` decimal(5, 1),
+    `MCV (fL) (CBC)` decimal(5, 1),
+    `MCH (pg) (CBC)`decimal(5, 1),
+    `MCHC (g/dl) (CBC)`decimal(5, 1),
+    `RDW (%) (CBC)` decimal(5, 1),
+    `Platelets (10^3/µl) (CBC)` int,
+    `WBC (10^3/µl) (CBC)`decimal(5, 2),
+    `Neutrophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Lymphocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Monocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Eosinophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Basophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Glucose (mg/dl) (Chem)` decimal(5, 1),
+    `BUN (mg/dl) (Chem)` decimal(5, 1),
+    `Creatinine (mg/dl) (Chem)` decimal(5, 2),
+	`eGFR (ml/min/1.73m^2) (Chem)` decimal(5, 2),
+    `Sodium (mEq/l) (Chem)` decimal(5, 1),
+    `Potassium (mEq/l) (Chem)` decimal(5, 1),
+    `Chloride (mEq/l) (Chem)` decimal(5, 1),
+    `Total_protein (g/dl) (Chem)` decimal(5, 2),
+    `Albumin (g/dl) (Chem)` decimal(5, 2),
+    `Uric_acid (mg/dl) (Chem)` decimal(5, 2),
+    `ALT (U/l) (Chem)` decimal(5, 1),
+    `AST (U/l) (Chem)` decimal(5, 1),
+    `ALP (U/l) (Chem)` decimal(5, 1),
+    `GGT (U/l) (Chem)` decimal(5, 1),
+    `Total_bilirubin (mg/dl) (Chem)` decimal(5, 2),
+    `TotalCholesterol (mg/dl) (Lipids)` decimal(5, 1),
+    `LDL (mg/dl) (Lipids)` decimal(5, 1),
+    `HDL (mg/dl) (Lipids)` decimal(5, 1),
+    `Triglycerides (mg/dl) (Lipids)` decimal(5, 1),
+    `ApoB (mg/dl) (Lipids)` decimal(5, 1),
+    `CRP (CRP)` decimal(5, 1),
+    dwh_load_date date default (date_format(now(), '%D %b %Y'))
+);
+-- ==========================================================================================
+
+drop table if exists erp_factlabtests_dis_child;
+create table erp_factlabtests_dis_child
+(
+	Encounter_ID int,
+	Patient_ID varchar(30),
+	`Phase` varchar(50),
+    `RBC (10^6/µl) (CBC)` decimal(5, 2),
+	`Hemoglobin (g/dl) (CBC)` decimal(5, 1),
+    `Hematocrit (%) (CBC)` decimal(5, 1),
+    `MCV (fL) (CBC)` decimal(5, 1),
+    `MCH (pg) (CBC)`decimal(5, 1),
+    `MCHC (g/dl) (CBC)`decimal(5, 1),
+    `RDW (%) (CBC)` decimal(5, 1),
+    `Platelets (10^3/µl) (CBC)` int,
+    `WBC (10^3/µl) (CBC)`decimal(5, 2),
+    `Neutrophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Lymphocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Monocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Eosinophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Basophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+    `Glucose (mg/dl) (Chem)` decimal(5, 1),
+    `BUN (mg/dl) (Chem)` decimal(5, 1),
+    `Creatinine (mg/dl) (Chem)` decimal(5, 2),
+	`eGFR (ml/min/1.73m^2) (Chem)` decimal(5, 2),
+    `Sodium (mEq/l) (Chem)` decimal(5, 1),
+    `Potassium (mEq/l) (Chem)` decimal(5, 1),
+    `Chloride (mEq/l) (Chem)` decimal(5, 1),
+    `Total_protein (g/dl) (Chem)` decimal(5, 2),
+    `Albumin (g/dl) (Chem)` decimal(5, 2),
+    `Uric_acid (mg/dl) (Chem)` decimal(5, 2),
+    `ALT (U/l) (Chem)` decimal(5, 1),
+    `AST (U/l) (Chem)` decimal(5, 1),
+    `ALP (U/l) (Chem)` decimal(5, 1),
+    `GGT (U/l) (Chem)` decimal(5, 1),
+    `Total_bilirubin (mg/dl) (Chem)` decimal(5, 2),
+    `TotalCholesterol (mg/dl) (Lipids)` decimal(5, 1),
+    `LDL (mg/dl) (Lipids)` decimal(5, 1),
+    `HDL (mg/dl) (Lipids)` decimal(5, 1),
+    `Triglycerides (mg/dl) (Lipids)` decimal(5, 1),
+    `ApoB (mg/dl) (Lipids)` decimal(5, 1),
+    `CRP (CRP)` decimal(5, 1),
     dwh_load_date date default (date_format(now(), '%D %b %Y'))
 );
 -- ==========================================================================================
@@ -246,6 +323,7 @@ create table erp_FactSpecialTests
 	Test_Result decimal(10, 2),
     dwh_load_date date default (date_format(now(), '%D %b %Y'))
 );
+-- ==========================================================================================
 
 drop table if exists erp_FactTreatment;
 create table erp_FactTreatment
