@@ -7,17 +7,13 @@ Script Purpose:
     * Run this script in order to re-define the silver layer if need be.
     
 Warning !
-* You have to execute the 'use mssilver;' query first before attempting to re-define the silver layer just incase you are using a different schema.
+	* This query block will truncate the whole silver layer's tables so do due dilligence before attempting to execute.
 =======================================================================================================================================================================
 */
 
-
-
-use mssilver;
-
 -- ==========================================================================================
-drop table if exists erp_Bridgeencounteradditionalservice;
-create table erp_Bridgeencounteradditionalservice
+drop table if exists mssilver.erp_Bridgeencounteradditionalservice;
+create table mssilver.erp_Bridgeencounteradditionalservice
 (
 	Encounter_ID int,
 	AdditionalServiceID int,
@@ -25,8 +21,8 @@ create table erp_Bridgeencounteradditionalservice
 );
 -- ==========================================================================================
 
-drop table if exists erp_Bridgeencounterdoctor;
-create table erp_Bridgeencounterdoctor
+drop table if exists mssilver.erp_Bridgeencounterdoctor;
+create table mssilver.erp_Bridgeencounterdoctor
 (
 	Encounter_ID int,
 	Doctor_ID int,
@@ -34,8 +30,8 @@ create table erp_Bridgeencounterdoctor
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimAdditionalService;
-create table erp_DimAdditionalService
+drop table if exists mssilver.erp_DimAdditionalService;
+create table mssilver.erp_DimAdditionalService
 (
 	AdditionalServiceID int,
 	ServiceName varchar(50),
@@ -43,8 +39,8 @@ create table erp_DimAdditionalService
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimAllergy;
-create table erp_DimAllergy
+drop table if exists mssilver.erp_DimAllergy;
+create table mssilver.erp_DimAllergy
 (
 	AllergyID int,
 	AllergyName varchar(50),
@@ -52,8 +48,8 @@ create table erp_DimAllergy
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimChronicDisease;
-create table erp_DimChronicDisease
+drop table if exists mssilver.erp_DimChronicDisease;
+create table mssilver.erp_DimChronicDisease
 (
 	ChronicDiseaseID int,
 	ChronicDiseaseName varchar(100),
@@ -61,8 +57,8 @@ create table erp_DimChronicDisease
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimDate;
-create table erp_DimDate
+drop table if exists mssilver.erp_DimDate;
+create table mssilver.erp_DimDate
 (
 	`Date` date,
 	DateKey int,
@@ -76,8 +72,8 @@ create table erp_DimDate
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimDisease;
-create table erp_DimDisease
+drop table if exists mssilver.erp_DimDisease;
+create table mssilver.erp_DimDisease
 (
 	Disease_ID int,
 	`Admission Diagnosis` varchar(150),
@@ -88,8 +84,8 @@ create table erp_DimDisease
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimDoctor;
-create table erp_DimDoctor
+drop table if exists mssilver.erp_DimDoctor;
+create table mssilver.erp_DimDoctor
 (
 	Doctor_ID int,
 	`Doctor Name` varchar(50),
@@ -102,8 +98,8 @@ create table erp_DimDoctor
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimInsuranceDetails;
-create table erp_DimInsuranceDetails
+drop table if exists mssilver.erp_DimInsuranceDetails;
+create table mssilver.erp_DimInsuranceDetails
 (
 	InsuranceKey int,
 	`Insurance Plan Name` varchar(30),
@@ -113,8 +109,8 @@ create table erp_DimInsuranceDetails
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimInsurancePackages;
-create table erp_DimInsurancePackages
+drop table if exists mssilver.erp_DimInsurancePackages;
+create table mssilver.erp_DimInsurancePackages
 (
 	`Conditions Partially Covered` varchar(200),
 	Basic varchar(30),
@@ -124,8 +120,8 @@ create table erp_DimInsurancePackages
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimPatient;
-create table erp_DimPatient
+drop table if exists mssilver.erp_DimPatient;
+create table mssilver.erp_DimPatient
 (
 	Patient_ID varchar(20),
 	`First Name` varchar(30),
@@ -141,8 +137,8 @@ create table erp_DimPatient
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimRoom;
-create table erp_DimRoom
+drop table if exists mssilver.erp_DimRoom;
+create table mssilver.erp_DimRoom
 (
 	RoomKey int,
 	Care_Level varchar(30),
@@ -151,30 +147,8 @@ create table erp_DimRoom
 );
 -- ==========================================================================================
 
-drop table if exists erp_DimSpecialTest;
-create table erp_DimSpecialTest
-(
-	Encounter_ID int,
-	Test_ID int,
-	Test_Phase varchar(30),
-	Test_Name varchar(100),
-	Test_Result decimal (8, 2),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
--- ==========================================================================================
-
-drop table if exists erp_DimTreatment;
-create table erp_DimTreatment
-(
-	Treatment_ID int,
-	Treatment_Type varchar(30),
-	Treatment_Name varchar(100),
-	dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
--- ==========================================================================================
-
-drop table if exists erp_FactCost;
-create table erp_FactCost
+drop table if exists mssilver.erp_FactCost;
+create table mssilver.erp_FactCost
 (
 	Encounter_ID int,
     DrugCost decimal(10,2),
@@ -198,8 +172,8 @@ create table erp_FactCost
 );
 -- ==========================================================================================
 
-drop table if exists erp_FactEncounter;
-create table erp_FactEncounter
+drop table if exists mssilver.erp_FactEncounter;
+create table mssilver.erp_FactEncounter
 (
 	Encounter_ID int,
 	Patient_ID varchar(30),
@@ -223,8 +197,8 @@ create table erp_FactEncounter
 );
 -- ==========================================================================================
 
-drop table if exists erp_factlabtests_adm_child;
-create table erp_factlabtests_adm_child
+drop table if exists mssilver.erp_factlabtests_adm_child;
+create table mssilver.erp_factlabtests_adm_child
 (
 	Encounter_ID int,
 	Patient_ID varchar(30),
@@ -268,8 +242,8 @@ create table erp_factlabtests_adm_child
 );
 -- ==========================================================================================
 
-drop table if exists erp_factlabtests_dis_child;
-create table erp_factlabtests_dis_child
+drop table if exists mssilver.erp_factlabtests_dis_child;
+create table mssilver.erp_factlabtests_dis_child
 (
 	Encounter_ID int,
 	Patient_ID varchar(30),
@@ -313,8 +287,8 @@ create table erp_factlabtests_dis_child
 );
 -- ==========================================================================================
 
-drop table if exists erp_FactSpecialTests;
-create table erp_FactSpecialTests
+drop table if exists mssilver.erp_FactSpecialTests;
+create table mssilver.erp_FactSpecialTests
 (
 	SpecialTest_ID int,
 	Encounter_ID int,
@@ -325,30 +299,26 @@ create table erp_FactSpecialTests
 );
 -- ==========================================================================================
 
-drop table if exists erp_FactTreatment;
-create table erp_FactTreatment
+drop table if exists mssilver.erp_FactTreatment;
+create table mssilver.erp_FactTreatment
 (
 	Encounter_ID int,
 	Treatment_ID int,
-	Treatment_Type varchar(30),
-	Treatment_Name varchar(100),
-	Follow_Up varchar(10),
-	Complications varchar(10),
+	Treatment_Type varchar (100),
+	Treatment_Name varchar (100),
+	Follow_Up varchar (100),
+	Complications varchar (100),
 	Drug_Boxes_Used int,
 	Therapy_Sessions int,
-	Drug_Cost int,
-	Surgery_Cost int,
-	Post_Surgery_Care_Cost int,
-	Education_Rehab_Cost int,
 	Hospital_Drug_Quantity int,
 	Discharge_Drug_Quantity int,
 	Total_Drug_Quantity int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
+	dwh_load_date date default (date_format(now(), '%D %b %Y'))
 );
 -- ==========================================================================================
 
-drop table if exists erp_FactTreatmentCost;
-create table erp_FactTreatmentCost
+drop table if exists mssilver.erp_FactTreatmentCost;
+create table mssilver.erp_FactTreatmentCost
 (
 	Encounter_ID int,
 	Treatment_ID varchar(20),
@@ -363,8 +333,8 @@ create table erp_FactTreatmentCost
 );
 -- ==========================================================================================
 
-drop table if exists erp_FactVitals;
-create table erp_FactVitals
+drop table if exists mssilver.erp_FactVitals;
+create table mssilver.erp_FactVitals
 (
 	Encounter_ID int,
 	Patient_ID varchar(20),
@@ -379,8 +349,8 @@ create table erp_FactVitals
 );
 -- ==========================================================================================
 
-drop table if exists erp_Patient_AdditionalService;
-create table erp_Patient_AdditionalService
+drop table if exists mssilver.erp_Patient_AdditionalService;
+create table mssilver.erp_Patient_AdditionalService
 (
 	Encounter_ID int,
 	AdditionalServiceID int,
@@ -388,8 +358,8 @@ create table erp_Patient_AdditionalService
 );
 -- ==========================================================================================
 
-drop table if exists erp_Patient_Allergy;
-create table erp_Patient_Allergy
+drop table if exists mssilver.erp_Patient_Allergy;
+create table mssilver.erp_Patient_Allergy
 (
 	Patient_ID varchar(20),
 	AllergyID int,
@@ -397,8 +367,8 @@ create table erp_Patient_Allergy
 );
 -- ==========================================================================================
 
-drop table if exists erp_Patient_ChronicDisease;
-create table erp_Patient_ChronicDisease
+drop table if exists mssilver.erp_Patient_ChronicDisease;
+create table mssilver.erp_Patient_ChronicDisease
 (
 	Patient_ID varchar(20),
 	ChronicDiseaseID int,
