@@ -1,377 +1,335 @@
 /*
 =======================================================================================================================================================================
-		CREATING THE SILVER TABLES
+		CREATING THE SILVER LAYER
 =======================================================================================================================================================================
 Script Purpose:
-	* The following DDL script goes ahead to drop each individual table in the silver layer ('mssilver') before re-creating each one of them.
-    * Run this script in order to re-define the silver layer if need be.
+	* The following stored procedure goes ahead to drop each individual table in the silver layer ('mssilver') before re-creating each one of them.
+    * Execute this stored procedure in order to re-define the silver layer if need be.
     
+How to use the stored procedure:
+	* Execute the query: (call mssilver.create_silver;)
+
 Warning !
 	* This query block will truncate the whole silver layer's tables so do due dilligence before attempting to execute.
 =======================================================================================================================================================================
 */
 
+Delimiter $$
+	create procedure mssilver.create_silver ()
+		begin
+
+			declare start_time time;
+			declare end_time time;
+
+			
+		set start_time = now();
 -- ==========================================================================================
-drop table if exists mssilver.erp_Bridgeencounteradditionalservice;
-create table mssilver.erp_Bridgeencounteradditionalservice
-(
-	Encounter_ID int,
-	AdditionalServiceID int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			
+            drop table if exists mssilver.erp_Bridgeencounteradditionalservice;
+			create table mssilver.erp_Bridgeencounteradditionalservice
+			(
+				Encounter_ID int,
+				AdditionalServiceID int,
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_Bridgeencounterdoctor;
-create table mssilver.erp_Bridgeencounterdoctor
-(
-	Encounter_ID int,
-	Doctor_ID int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_Bridgeencounterdoctor;
+			create table mssilver.erp_Bridgeencounterdoctor
+			(
+				Encounter_ID int,
+				Doctor_ID int,
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimAdditionalService;
-create table mssilver.erp_DimAdditionalService
-(
-	AdditionalServiceID int,
-	ServiceName varchar(50),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimAdditionalService;
+			create table mssilver.erp_DimAdditionalService
+			(
+				AdditionalServiceID int,
+				ServiceName varchar(50),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimAllergy;
-create table mssilver.erp_DimAllergy
-(
-	AllergyID int,
-	AllergyName varchar(50),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimAllergy;
+			create table mssilver.erp_DimAllergy
+			(
+				AllergyID int,
+				AllergyName varchar(50),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimChronicDisease;
-create table mssilver.erp_DimChronicDisease
-(
-	ChronicDiseaseID int,
-	ChronicDiseaseName varchar(100),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimChronicDisease;
+			create table mssilver.erp_DimChronicDisease
+			(
+				ChronicDiseaseID int,
+				ChronicDiseaseName varchar(100),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimDate;
-create table mssilver.erp_DimDate
-(
-	`Date` date,
-	DateKey int,
-	`Year` varchar(20),
-	`Month`int,
-	`day` int,
-	`quarter` int,
-	`weekday` int,
-	Date_String varchar(20),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimDate;
+			create table mssilver.erp_DimDate
+			(
+				`Date` date,
+				DateKey int,
+				`Year` int,
+				`Month` varchar(50),
+				`day` int,
+				`quarter` varchar(10),
+				`weekday` int,
+				Date_String varchar(50),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimDisease;
-create table mssilver.erp_DimDisease
-(
-	Disease_ID int,
-	`Admission Diagnosis` varchar(150),
-	`Disease Type` varchar(50),
-	`Disease Severity` int,
-	`Medical Unit` varchar(50),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimDisease;
+			create table mssilver.erp_DimDisease
+			(
+				Disease_ID int,
+				`Admission Diagnosis` varchar(150),
+				`Disease Type` varchar(50),
+				`Disease Severity` int,
+				`Medical Unit` varchar(50),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimDoctor;
-create table mssilver.erp_DimDoctor
-(
-	Doctor_ID int,
-	`Doctor Name` varchar(50),
-	`Doctor Surname` varchar(50),
-	`Doctor Title` varchar(30),
-	`Doctor Nationality` varchar(30),
-	`Medical Unit` varchar(50),
-	`Max Patient Count` int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimDoctor;
+			create table mssilver.erp_DimDoctor
+			(
+				Doctor_ID int,
+				`Doctor Name` varchar(50),
+				`Doctor Surname` varchar(50),
+				`Doctor Title` varchar(30),
+				`Doctor Nationality` varchar(30),
+				`Medical Unit` varchar(50),
+				`Max Patient Count` int,
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimInsuranceDetails;
-create table mssilver.erp_DimInsuranceDetails
-(
-	InsuranceKey int,
-	`Insurance Plan Name` varchar(30),
-	`Coverage Limit` decimal(4, 2),
-	Deductible int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimInsuranceDetails;
+			create table mssilver.erp_DimInsuranceDetails
+			(
+				InsuranceKey int,
+				`Insurance Plan Name` varchar(30),
+				`Coverage Limit` decimal(4, 2),
+				Deductible int,
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimInsurancePackages;
-create table mssilver.erp_DimInsurancePackages
-(
-	`Conditions Partially Covered` varchar(200),
-	Basic varchar(30),
-	Standard varchar(30),
-	Premium varchar(30),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimInsurancePackages;
+			create table mssilver.erp_DimInsurancePackages
+			(
+				`Conditions Partially Covered` varchar(200),
+				Basic varchar(50),
+				Standard varchar(50),
+				Premium varchar(50),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimPatient;
-create table mssilver.erp_DimPatient
-(
-	Patient_ID varchar(20),
-	`First Name` varchar(30),
-	`Last Name` varchar(50),
-	Gender varchar(20),
-	`Birth Date` varchar(20),
-	Height int,
-	Weight int,
-	`Marital Status` varchar(10),
-	Nationality varchar(30),
-	`Blood Type` varchar(10),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimPatient;
+			create table mssilver.erp_DimPatient
+			(
+				Patient_ID varchar(20),
+				`First Name` varchar(50),
+				`Last Name` varchar(50),
+				Gender varchar(20),
+				`Birth Date` date,
+				Height int,
+				Weight int,
+				`Marital Status` varchar(10),
+				Nationality varchar(50),
+				`Blood Type` varchar(10),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_DimRoom;
-create table mssilver.erp_DimRoom
-(
-	RoomKey int,
-	Care_Level varchar(30),
-	`Room Type` varchar(30),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_DimRoom;
+			create table mssilver.erp_DimRoom
+			(
+				RoomKey int,
+				Care_Level varchar(30),
+				`Room Type` varchar(50),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_FactCost;
-create table mssilver.erp_FactCost
-(
-	Encounter_ID int,
-    DrugCost decimal(10,2),
-    SurgeryCost decimal(10,2),
-    PostSurgeryCare decimal(10,2),
-    EducationRehab decimal(10,2),
-    PsychologicalSupport decimal(10,2),
-    RoomCost decimal(10,2),
-    CompanionAccommodation decimal(10,2),
-    NutritionCost decimal(10,2),
-    RadiologyCost decimal(10,2),
-    EndoscopyCost decimal(10,2),
-    AdditionalInsuranceFees decimal(10,2),
-    TotalCost decimal(10,2),
-    InsuranceCoverage decimal(10,2),
-    OutOfPocketCost decimal(10,2),
-    CBC_Cost decimal(10,2),
-    Chem_Cost decimal(10,2),
-    Lipid_Cost decimal(10,2),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_FactCost;
+			create table mssilver.erp_FactCost
+			(
+				Encounter_ID int,
+				DrugCost decimal(10,2),
+				SurgeryCost decimal(10,2),
+				PostSurgeryCare decimal(10,2),
+				EducationRehab decimal(10,2),
+				PsychologicalSupport decimal(10,2),
+				RoomCost decimal(10,2),
+				CompanionAccommodation decimal(10,2),
+				NutritionCost decimal(10,2),
+				RadiologyCost decimal(10,2),
+				EndoscopyCost decimal(10,2),
+				AdditionalInsuranceFees decimal(10,2),
+				TotalCost decimal(10,2),
+				InsuranceCoverage decimal(10,2),
+				OutOfPocketCost decimal(10,2),
+				CBC_Cost decimal(10,2),
+				Chem_Cost decimal(10,2),
+				Lipid_Cost decimal(10,2),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_FactEncounter;
-create table mssilver.erp_FactEncounter
-(
-	Encounter_ID int,
-	Patient_ID varchar(30),
-	Disease_ID int,
-	ResponsibleDoctorID int,
-	InsuranceKey int,
-	RoomKey int,
-    der_CheckinDate date,
-    der_CheckinTime date,
-    der_CheckoutDate time,
-    der_CheckoutTime time,
-	CheckinDateKey int,
-	CheckoutDateKey int,
-	Patient_Severity_Score decimal(6, 2),
-	RadiologyType varchar(30),
-	RadiologyProcedureCount int,
-	EndoscopyType varchar(50),
-	EndoscopyProcedureCount int,
-	CompanionPresent varchar(30),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_FactEncounter;
+			create table mssilver.erp_FactEncounter
+			(
+				Encounter_ID int,
+				Patient_ID varchar(30),
+				Disease_ID int,
+				ResponsibleDoctorID int,
+				InsuranceKey int,
+				RoomKey int,
+				der_CheckinDate date,
+				der_CheckinTime time,
+				der_CheckoutDate date,
+				der_CheckoutTime time,
+				CheckinDateKey int,
+				CheckoutDateKey int,
+				Patient_Severity_Score decimal(6, 2),
+				RadiologyType varchar(30),
+				RadiologyProcedureCount int,
+				EndoscopyType varchar(50),
+				EndoscopyProcedureCount int,
+				CompanionPresent varchar(30),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_factlabtests_adm_child;
-create table mssilver.erp_factlabtests_adm_child
-(
-	Encounter_ID int,
-	Patient_ID varchar(30),
-	`Phase` varchar(50),
-    `RBC (10^6/µl) (CBC)` decimal(5, 2),
-	`Hemoglobin (g/dl) (CBC)` decimal(5, 1),
-    `Hematocrit (%) (CBC)` decimal(5, 1),
-    `MCV (fL) (CBC)` decimal(5, 1),
-    `MCH (pg) (CBC)`decimal(5, 1),
-    `MCHC (g/dl) (CBC)`decimal(5, 1),
-    `RDW (%) (CBC)` decimal(5, 1),
-    `Platelets (10^3/µl) (CBC)` int,
-    `WBC (10^3/µl) (CBC)`decimal(5, 2),
-    `Neutrophils_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Lymphocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Monocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Eosinophils_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Basophils_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Glucose (mg/dl) (Chem)` decimal(5, 1),
-    `BUN (mg/dl) (Chem)` decimal(5, 1),
-    `Creatinine (mg/dl) (Chem)` decimal(5, 2),
-	`eGFR (ml/min/1.73m^2) (Chem)` decimal(5, 2),
-    `Sodium (mEq/l) (Chem)` decimal(5, 1),
-    `Potassium (mEq/l) (Chem)` decimal(5, 1),
-    `Chloride (mEq/l) (Chem)` decimal(5, 1),
-    `Total_protein (g/dl) (Chem)` decimal(5, 2),
-    `Albumin (g/dl) (Chem)` decimal(5, 2),
-    `Uric_acid (mg/dl) (Chem)` decimal(5, 2),
-    `ALT (U/l) (Chem)` decimal(5, 1),
-    `AST (U/l) (Chem)` decimal(5, 1),
-    `ALP (U/l) (Chem)` decimal(5, 1),
-    `GGT (U/l) (Chem)` decimal(5, 1),
-    `Total_bilirubin (mg/dl) (Chem)` decimal(5, 2),
-    `TotalCholesterol (mg/dl) (Lipids)` decimal(5, 1),
-    `LDL (mg/dl) (Lipids)` decimal(5, 1),
-    `HDL (mg/dl) (Lipids)` decimal(5, 1),
-    `Triglycerides (mg/dl) (Lipids)` decimal(5, 1),
-    `ApoB (mg/dl) (Lipids)` decimal(5, 1),
-    `CRP (CRP)` decimal(5, 1),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_factlabtests;
+			create table mssilver.erp_factlabtests
+			(
+				Encounter_ID int,
+				Patient_ID varchar(30),
+				`Phase` varchar(50),
+				`RBC (10^6/µl) (CBC)` decimal(5, 2),
+				`Hemoglobin (g/dl) (CBC)` decimal(5, 1),
+				`Hematocrit (%) (CBC)` decimal(5, 1),
+				`MCV (fL) (CBC)` decimal(5, 1),
+				`MCH (pg) (CBC)` decimal(5, 1),
+				`MCHC (g/dl) (CBC)` decimal(5, 1),
+				`RDW (%) (CBC)` decimal(5, 1),
+				`Platelets (10^3/µl) (CBC)` int,
+				`WBC (10^3/µl) (CBC)` decimal(5, 2),
+				`Neutrophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+				`Lymphocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
+				`Monocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
+				`Eosinophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+				`Basophils_abs (10^3/µl) (CBC)` decimal(5, 2),
+				`Glucose (mg/dl) (Chem)` decimal(5, 1),
+				`BUN (mg/dl) (Chem)` decimal(5, 1),
+				`Creatinine (mg/dl) (Chem)` decimal(5, 2),
+				`eGFR (ml/min/1.73m^2) (Chem)` decimal(5, 2),
+				`Sodium (mEq/l) (Chem)` decimal(5, 1),
+				`Potassium (mEq/l) (Chem)` decimal(5, 1),
+				`Chloride (mEq/l) (Chem)` decimal(5, 1),
+				`Total_protein (g/dl) (Chem)` decimal(5, 2),
+				`Albumin (g/dl) (Chem)` decimal(5, 2),
+				`Uric_acid (mg/dl) (Chem)` decimal(5, 2),
+				`ALT (U/l) (Chem)` decimal(5, 1),
+				`AST (U/l) (Chem)` decimal(5, 1),
+				`ALP (U/l) (Chem)` decimal(5, 1),
+				`GGT (U/l) (Chem)` decimal(5, 1),
+				`Total_bilirubin (mg/dl) (Chem)` decimal(5, 2),
+				`TotalCholesterol (mg/dl) (Lipids)` decimal(5, 1),
+				`LDL (mg/dl) (Lipids)` decimal(5, 1),
+				`HDL (mg/dl) (Lipids)` decimal(5, 1),
+				`Triglycerides (mg/dl) (Lipids)` decimal(5, 1),
+				`ApoB (mg/dl) (Lipids)` decimal(5, 1),
+				`CRP (CRP)` decimal(5, 1),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_factlabtests_dis_child;
-create table mssilver.erp_factlabtests_dis_child
-(
-	Encounter_ID int,
-	Patient_ID varchar(30),
-	`Phase` varchar(50),
-    `RBC (10^6/µl) (CBC)` decimal(5, 2),
-	`Hemoglobin (g/dl) (CBC)` decimal(5, 1),
-    `Hematocrit (%) (CBC)` decimal(5, 1),
-    `MCV (fL) (CBC)` decimal(5, 1),
-    `MCH (pg) (CBC)`decimal(5, 1),
-    `MCHC (g/dl) (CBC)`decimal(5, 1),
-    `RDW (%) (CBC)` decimal(5, 1),
-    `Platelets (10^3/µl) (CBC)` int,
-    `WBC (10^3/µl) (CBC)`decimal(5, 2),
-    `Neutrophils_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Lymphocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Monocytes_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Eosinophils_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Basophils_abs (10^3/µl) (CBC)` decimal(5, 2),
-    `Glucose (mg/dl) (Chem)` decimal(5, 1),
-    `BUN (mg/dl) (Chem)` decimal(5, 1),
-    `Creatinine (mg/dl) (Chem)` decimal(5, 2),
-	`eGFR (ml/min/1.73m^2) (Chem)` decimal(5, 2),
-    `Sodium (mEq/l) (Chem)` decimal(5, 1),
-    `Potassium (mEq/l) (Chem)` decimal(5, 1),
-    `Chloride (mEq/l) (Chem)` decimal(5, 1),
-    `Total_protein (g/dl) (Chem)` decimal(5, 2),
-    `Albumin (g/dl) (Chem)` decimal(5, 2),
-    `Uric_acid (mg/dl) (Chem)` decimal(5, 2),
-    `ALT (U/l) (Chem)` decimal(5, 1),
-    `AST (U/l) (Chem)` decimal(5, 1),
-    `ALP (U/l) (Chem)` decimal(5, 1),
-    `GGT (U/l) (Chem)` decimal(5, 1),
-    `Total_bilirubin (mg/dl) (Chem)` decimal(5, 2),
-    `TotalCholesterol (mg/dl) (Lipids)` decimal(5, 1),
-    `LDL (mg/dl) (Lipids)` decimal(5, 1),
-    `HDL (mg/dl) (Lipids)` decimal(5, 1),
-    `Triglycerides (mg/dl) (Lipids)` decimal(5, 1),
-    `ApoB (mg/dl) (Lipids)` decimal(5, 1),
-    `CRP (CRP)` decimal(5, 1),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_FactSpecialTests;
+			create table mssilver.erp_FactSpecialTests
+			(
+				SpecialTest_ID int,
+				Encounter_ID int,
+				Test_Phase varchar(30),
+				Test_Name varchar(150),
+				Test_Result decimal(10, 2),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_FactSpecialTests;
-create table mssilver.erp_FactSpecialTests
-(
-	SpecialTest_ID int,
-	Encounter_ID int,
-	Test_Phase varchar(30),
-	Test_Name varchar(150),
-	Test_Result decimal(10, 2),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_FactTreatment;
+			create table mssilver.erp_FactTreatment
+			(
+				Encounter_ID int,
+				Treatment_ID int,
+				Treatment_Type varchar(50),
+				Treatment_Name varchar(100),
+				Follow_Up varchar(50),
+				Complications varchar(50),
+				Drug_Boxes_Used int,
+				Therapy_Sessions int,
+				Drug_Cost int,
+				Surgery_Cost int,
+				Post_Surgery_Care_Cost int,
+				Education_Rehab_Cost int,
+				Hospital_Drug_Quantity int,
+				Discharge_Drug_Quantity int,
+				Total_Drug_Quantity int,
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_FactTreatment;
-create table mssilver.erp_FactTreatment
-(
-	Encounter_ID int,
-	Treatment_ID int,
-	Treatment_Type varchar (100),
-	Treatment_Name varchar (100),
-	Follow_Up varchar (100),
-	Complications varchar (100),
-	Drug_Boxes_Used int,
-	Therapy_Sessions int,
-	Hospital_Drug_Quantity int,
-	Discharge_Drug_Quantity int,
-	Total_Drug_Quantity int,
-	dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_FactVitals;
+			create table mssilver.erp_FactVitals
+			(
+				Encounter_ID int,
+				Patient_ID varchar(20),
+				`Phase` varchar(40),
+				HeartRate decimal(4, 1),
+				Temperature decimal(4, 1),
+				SystolicBP int,
+				DiastolicBP int,
+				RespRate int,
+				O2Sat decimal(4, 1),
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_FactTreatmentCost;
-create table mssilver.erp_FactTreatmentCost
-(
-	Encounter_ID int,
-	Treatment_ID varchar(20),
-	Drug_Cost int,
-	Surgery_Cost int,
-	Post_Surgery_Care_Cost int,
-	Education_Rehab_Cost int,
-	Hospital_Drug_Quantity int,
-	Discharge_Drug_Quantity int,
-	Total_Drug_Quantity int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_Patient_Allergy;
+			create table mssilver.erp_Patient_Allergy
+			(
+				Patient_ID varchar(20),
+				AllergyID int,
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_FactVitals;
-create table mssilver.erp_FactVitals
-(
-	Encounter_ID int,
-	Patient_ID varchar(20),
-	`Phase` varchar(40),
-	HeartRate decimal(4, 1),
-	Temperature decimal(4, 1),
-	SystolicBP int,
-	DiastolicBP int,
-	RespRate int,
-	O2Sat decimal(4, 1),
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			drop table if exists mssilver.erp_Patient_ChronicDisease;
+			create table mssilver.erp_Patient_ChronicDisease
+			(
+				Patient_ID varchar(20),
+				ChronicDiseaseID int,
+				dwh_load_date varchar(50) default (date_format(now(), '%D %b %Y'))
+			);
 -- ==========================================================================================
 
-drop table if exists mssilver.erp_Patient_AdditionalService;
-create table mssilver.erp_Patient_AdditionalService
-(
-	Encounter_ID int,
-	AdditionalServiceID int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
--- ==========================================================================================
-
-drop table if exists mssilver.erp_Patient_Allergy;
-create table mssilver.erp_Patient_Allergy
-(
-	Patient_ID varchar(20),
-	AllergyID int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
--- ==========================================================================================
-
-drop table if exists mssilver.erp_Patient_ChronicDisease;
-create table mssilver.erp_Patient_ChronicDisease
-(
-	Patient_ID varchar(20),
-	ChronicDiseaseID int,
-    dwh_load_date date default (date_format(now(), '%D %b %Y'))
-);
+			set end_time = now();
+			
+		select 	'Re-defining the Silver Layer' `Action`,
+				start_time `Execution Start Time`,
+				end_time `Execution End Time`,
+				concat(timestampdiff(second, start_time, end_time), ' Second') Duration;
+			
+		end$$
+Delimiter ;
 -- =====================================================================================================================================================================
