@@ -1,1 +1,2085 @@
+/*
+=======================================================================================================================================================================
+		CLEANING THE BRONZE LAYER's RAW DATA (msbronze)
+=======================================================================================================================================================================
+Script Purpose:
+	* The following query block is the documented evidence of the various steps I took in order to clean, standardize and organize data from the bronze layer.
+    * The query block involves transformation like:
+													- Data Integration
+                                                    - Deriving columns
+                                                    - Data normalization
+                                                    - Removing duplicates
+                                                    - Data filtering
+                                                    - Handling missing data
+                                                    - Handling invalid values
+                                                    - Handling unwanted spaces
+                                                    - Data type casting
+	* If in future there are cases where I would like to alter a cleaning technique, maybe add something or remove something, I will come back to this query block.
+=======================================================================================================================================================================
+*/
 
+select *
+from msbronze.erp_bridgeencounteradditionalservice;
+/*
+	* Being that the table above is a bridge table, there will be no need to check for the distinct values in each column (repetitions are allowed).
+	* But I will still check if there are any duplicates.
+*/
+
+-- Test: Checking for duplicates
+with cte_name as
+(select 
+	Encounter_ID,
+    AdditionalServiceID,
+    row_number() over(partition by Encounter_ID, AdditionalServiceID order by Encounter_ID) rrank
+from msbronze.erp_BridgeEncounterAdditionalService)
+
+select
+	Encounter_ID,
+    AdditionalServiceID
+from cte_name
+where rrank > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls
+select *
+from msbronze.erp_BridgeEncounterAdditionalService
+where 	Encounter_ID is null
+		or AdditionalServiceID is null;
+-- Result: Zero nulls found
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final cleansed data to be inserted into the mssilver.erp_BridgeEncounterAdditionalService table:
+
+select 
+		Encounter_ID,
+		AdditionalServiceID
+from msbronze.erp_bridgeencounteradditionalservice;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_bridgeencounterdoctor;
+/*
+	* Being that the table above is a bridge table, there will be no need to check for the distinct values in each column (repetitions are allowed).
+	* But I will still check if there are any duplicates.
+*/
+
+-- Test: Checking for duplicates
+with cte_name as
+(select 
+	Encounter_ID,
+    Doctor_ID,
+    row_number() over(partition by Encounter_ID, Doctor_ID order by Encounter_ID) rrank
+from msbronze.erp_bridgeencounterdoctor)
+
+select
+	Encounter_ID,
+    Doctor_ID
+from cte_name
+where rrank > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls
+select *
+from msbronze.erp_bridgeencounterdoctor
+where 	Encounter_ID is null
+		or Doctor_ID is null;
+-- Result: Zero nulls found
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final cleansed data to be inserted into the mssilver.erp_bridgeencounterdoctor table:
+
+select
+	Encounter_ID,
+    Doctor_ID
+from msbronze.erp_bridgeencounterdoctor;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_dimadditionalservice;
+-- Due to the fact that the table is small, there is no need to query for duplicates nor nulls because they would have been easily visible.
+
+-- Final cleansed data to be inserted into the mssilver.erp_dimadditionalservice table:
+select
+	AdditionalServiceID,
+    trim(ServiceName) ServiceName
+from msbronze.erp_dimadditionalservice;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_dimallergy;
+-- I can see that this table contains the various types of allergies that the hospital has ever come accross with their respective IDs.
+
+-- Test: Checking for any errors in the AllergyName column.
+select distinct AllergyName
+from msbronze.erp_dimallergy
+order by AllergyName;
+-- Result: Zero errors found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+select *
+from msbronze.erp_dimallergy
+where 	AllergyID is null 
+		or AllergyName is null;
+-- Result: Zero nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for duplicates
+with cte_name as
+(
+	select
+		AllergyID,
+		trim(AllergyName) AllergyName,
+		row_number() over(partition by AllergyID, trim(AllergyName)) row_num
+	from msbronze.erp_dimallergy
+	order by AllergyID
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final cleansed data to be inserted into the mssilver.erp_dimallergy table:
+
+select
+	AllergyID,
+    trim(AllergyName) AllergyName
+from msbronze.erp_dimallergy
+order by AllergyID;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_dimchronicdisease;
+
+-- Test: Checking for any errors in the ChronicDiseaseName column.
+select distinct ChronicDiseaseName
+from msbronze.erp_dimchronicdisease
+order by ChronicDiseaseName;
+-- Result: Zero errors found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+select *
+from msbronze.erp_dimchronicdisease
+where 	ChronicDiseaseID is null
+		or ChronicDiseaseName is null;
+-- Result: Zero nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for duplicates
+with cte_name as
+(
+	select
+		ChronicDiseaseID,
+		trim(ChronicDiseaseName) ChronicDiseaseName,
+		row_number() over(partition by ChronicDiseaseID, trim(ChronicDiseaseName)) rrank
+	from msbronze.erp_dimchronicdisease
+)
+
+select
+		ChronicDiseaseID,
+        ChronicDiseaseName
+from cte_name
+where rrank > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final cleansed data to be inserted into the mssilver.erp_dimchronicdisease table:
+select
+	ChronicDiseaseID,
+    trim(ChronicDiseaseName) ChronicDiseaseName
+from msbronze.erp_dimchronicdisease;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_dimdate;
+/*
+	* From just a glance of this table, I can see that the table contains various details about a date. i.e. month, day, quarter, weekday etc.
+    * So by using the date column, I have to ensure the all the other columns have accurate information as per the date column's contents.
+    * And, I can also map some values into more friendlier values i.e. the month column can read the month in string instead of and integer.
+    * Also, I can see that the DateKey column is a unique identifier of the date values. And it is mapped from the date value but starting from end to beginning.
+		i.e. '1908-01-08' ==> '8011908' (The actual date starting from the end to the start becomes the DateKey which is the primary key of this table).
+	* The Date column has been defined as a 'Date' datatype column so invalid dates cannot be inserted into it by default.
+	* So the first thing I will do is to check if there are nulls in the Date column or date values that are in the future.(using today (17-02-2026) as a reference). 
+    * Then after that I can map out all the other columns' values from the Date column.
+*/
+
+-- Test: Checking for nulls or dates that are in the future.
+select `Date`
+from msbronze.erp_dimdate
+where 	`Date` is null
+		or Date > date(now());
+-- Result: Zero nulls found. There are also no dates that are in the future.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for duplicates.
+select 
+		`Date`,
+		count(*)
+from msbronze.erp_dimdate
+group by `Date`
+having count(*) > 1;
+-- Result: Zero duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final cleansed data to be inserted into the mssilver.erp_dimdate table:
+select
+		`Date`,
+        date_format(`Date`, '%d%m%Y') DateKey,
+		year(`Date`) `Year`,
+		monthname(`Date`) `Month`,
+		day(`Date`) `day`,
+		case 	when quarter(`Date`) = 1 then '1st'
+				when quarter(`Date`) = 2 then '2nd'
+                when quarter(`Date`) = 3 then '3rd'
+                when quarter(`Date`) = 4 then '4th'
+		end `quarter`,
+		dayofweek(`Date`) weekday,
+		date_format(`Date`, '%d-%m-%Y') Date_String
+from msbronze.erp_dimdate;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_dimdisease;
+-- From a glance of this table, I can see that this table contains the various diseases diagnosed at admission and their severity.
+
+-- Test: Checking for duplicates.
+with cte_name as
+(
+select 
+		Disease_ID,
+		trim(`Admission Diagnosis`) `Admission Diagnosis`,
+		trim(`Disease Type`) `Disease Type`,
+		`Disease Severity`,
+		trim(`Medical Unit`) `Medical Unit`,
+        row_number() over	(partition by 
+								Disease_ID,
+								trim(`Admission Diagnosis`),
+								trim(`Disease Type`),
+								`Disease Severity`,
+								trim(`Medical Unit`)
+							) row_num
+from msbronze.erp_dimdisease
+)
+select *
+from cte_name
+where row_num > 1;
+-- Result: Zero duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+select *
+from msbronze.erp_dimdisease
+where	Disease_ID is null
+		or `Admission Diagnosis` is null
+        or `Disease Type` is null
+        or `Disease Severity` is null
+        or `Medical Unit` is null;
+-- Result: Zero nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final cleansed data to be inserted into the mssilver.erp_dimdisease table:
+select
+	Disease_ID,
+    trim(`Admission Diagnosis`) `Admission Diagnosis`,
+    trim(`Disease Type`) `Disease Type`,
+    `Disease Severity`,
+    trim(`Medical Unit`) `Medical Unit`
+from msbronze.erp_dimdisease;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_dimdoctor;
+-- From a quick glance of this table, I can see that it contains personal information of the various doctors in MedSynora medical centre.
+
+-- Test: Checking for duplicates.
+
+with cte_name as
+(
+	select 
+			Doctor_ID,
+			trim(`Doctor Name`) `Doctor Name`,
+			trim(`Doctor Surname`) `Doctor Surname`,
+			trim(`Doctor Title`) `Doctor Title`,
+			trim(`Doctor Nationality`) `Doctor Nationality`,
+			trim(`Medical Unit`) `Medical Unit`,
+			`Max Patient Count`,
+            row_number() over	(partition by
+									Doctor_ID,
+									trim(`Doctor Name`),
+									trim(`Doctor Surname`),
+									trim(`Doctor Title`),
+									trim(`Doctor Nationality`),
+									trim(`Medical Unit`),
+									`Max Patient Count`
+								) row_num
+	from msbronze.erp_dimdoctor
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: Zero duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+select *
+from msbronze.erp_dimdoctor
+where 	Doctor_ID is null
+		or `Doctor Name` is null
+        or `Doctor Surname` is null
+        or `Doctor Title` is null
+        or `Doctor Nationality` is null
+        or `Medical Unit` is null
+        or `Max Patient Count` is null;
+-- Result: Zero nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final cleansed data to be inserted into the mssilver.erp_dimdoctor table:
+select
+	Doctor_ID,
+    trim(`Doctor Name`) `Doctor Name`,
+    trim(`Doctor Surname`) `Doctor Surname`,
+    trim(`Doctor Title`) `Doctor Title`,
+    trim(`Doctor Nationality`) `Doctor Nationality`,
+    trim(`Medical Unit`) `Medical Unit`,
+    `Max Patient Count`
+from msbronze.erp_dimdoctor;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_diminsurancedetails;
+-- Due to the small size of the table, at a single glance, it is evident that duplicates and nulls are absent.
+
+-- Final cleansed data to be inserted into the mssilver.erp_diminsurancedetails table:
+select
+		InsuranceKey,
+        trim(`Insurance Plan Name`) `Insurance Plan Name`,
+        `Coverage Limit`,
+        Deductible
+from msbronze.erp_diminsurancedetails;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_diminsurancepackages;
+-- Due to the small size of the table, at a single glance, it is evident that duplicates and nulls are absent.
+/*	
+	* However, there are cell entries that display 'info absent'.
+	* If I had any contact with the data's source system experts, I would have consulted them regarding this issue.
+    * Otherwise, I will choose to let them remain as they are.
+    * I decided also to map the values in the 'Basic', 'Standard' and 'Premium' columns to more human friendly values.
+		(From 0s and 1s to 'Yes' and 'No'.)
+*/
+
+-- Final cleansed data to be inserted into the mssilver.erp_diminsurancepackages table:
+select
+	trim(`Conditions Partially Covered`) `Conditions Partially Covered`,
+    case 	when trim(Basic) = 1 then 'Yes'
+            when trim(Basic) = 'info absent' then 'info absent'
+			else 'No'
+	end Basic,
+    case 	when trim(Standard) = 1 then 'Yes'
+            when trim(Standard) = 'info absent' then 'info absent'
+			else 'No'
+	end Standard,
+    case 	when trim(Premium) = 1 then 'Yes'
+            when trim(Premium) = 'info absent' then 'info absent'
+			else 'No'
+	end Premium
+from msbronze.erp_diminsurancepackages;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_dimpatient;
+-- The table contains the various information about the patients that have visited MedSynora Medical Centre.
+
+-- Test: Checking for duplicates.
+with cte_name as
+(
+select 
+		trim(Patient_ID) Patient_ID, 
+		trim(`First Name`) `First Name`, 
+		trim(`Last Name`) `Last Name`, 
+		trim(`Gender`) `Gender`, 
+		trim(`Birth Date`) `Birth Date`, 
+		`Height`, 
+		`Weight`,
+		trim(`Marital Status`) `Marital Status`,
+		trim(`Nationality`) `Nationality`,
+		trim(`Blood Type`) `Blood Type`,
+        row_number() over	(partition by
+								trim(Patient_ID), 
+								trim(`First Name`), 
+								trim(`Last Name`), 
+								trim(`Gender`), 
+								trim(`Birth Date`), 
+								`Height`, 
+								`Weight`,
+								trim(`Marital Status`),
+								trim(`Nationality`),
+								trim(`Blood Type`)
+							) row_num
+from msbronze.erp_dimpatient
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: Zero duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+select *
+from msbronze.erp_dimpatient
+where 	Patient_ID is null 
+		or `First Name` is null 
+		or `Last Name` is null 
+		or `Gender` is null 
+		or `Birth Date` is null 
+		or `Height` is null 
+		or `Weight`is null
+		or `Marital Status` is null
+		or`Nationality` is null
+		or `Blood Type` is null;
+-- Result: Zero nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for distinct values in the gender column.
+-- Expectation: ONLY 2 values: 'Male' and 'Female'.
+select distinct Gender
+from msbronze.erp_dimpatient;
+-- Result: As per expectation.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for invalid dates in the 'Birth Date' column. (dates like '2020-02-35' or '2020-50-06')
+select cast(`Birth Date` as date)
+from msbronze.erp_dimpatient;
+-- Result: All date values are valid date values.
+
+-- Test: Checking for invalid dates in the 'Birth Date' column. (Birth dates in the future)
+select cast(`Birth Date` as date)
+from msbronze.erp_dimpatient
+where cast(`Birth Date` as date) > now();
+-- Result: No future dates.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for the distinct value in the 'Marital Status' column.
+select distinct `Marital Status`
+from msbronze.erp_dimpatient;
+-- Result: 4 values. ('Single', 'Divorced', 'Married' and 'Widowed'). This is all okay.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for the distinct values in the `Blood Type` column.
+-- Expectation: 8 distinct values. (There only exists 8 standard types of blood groups.)
+select distinct `Blood Type`
+from msbronze.erp_dimpatient;
+-- Result: 8 different types.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final cleansed data to be inserted into the mssilver.erp_dimpatient table:
+
+select
+    trim(`Patient_ID`) `Patient_ID`,
+    trim(`First Name`) `First Name`,
+    trim(`Last Name`) `Last Name`,
+    trim(`Gender`) `Gender`,
+    cast(trim(`Birth Date`) as date) `Birth Date`,
+    Height,
+    Weight,
+    trim(`Marital Status`) `Marital Status`,
+    trim(Nationality) Nationality,
+    trim(`Blood Type`) `Blood Type`
+from msbronze.erp_dimpatient;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_dimroom;
+-- From the looks of this table, it is quite small and from a single glance one can clearly see the absence of duplicates and nulls.
+
+-- Final cleansed data to be inserted into the mssilver.erp_dimroom table:
+select
+		RoomKey,
+        trim(Care_Level) Care_Level,
+        trim(`Room Type`) `Room Type`
+from msbronze.erp_dimroom;
+/* 
+=======================================================================================================================================================================
+*/
+select *
+from msbronze.erp_factcost;
+-- This table contains the different types of costs and amounts that each patient was charged during their visit to the Medsynora medical centre.
+
+-- Test: Checking for duplicates
+with cte_name as
+(
+select 	Encounter_ID,
+		trim(CostType) CostType,
+        trim(CostAmount) CostAmount,
+        row_number() over	(partition by
+								Encounter_ID,
+								trim(CostType),
+								trim(CostAmount)
+							) row_num
+from msbronze.erp_factcost
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+select *
+from msbronze.erp_factcost
+where 	Encounter_ID is null
+		or trim(CostType) is null
+		or trim(CostAmount) is null;
+-- Result: Zero nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+/* 
+		* Upon taking a closer look at the table, I discovered that EACH distinct Encounter_ID has EXACTLY 17 events/records.
+        * This suggests that the table is in the long format hence the huge number of rows (2,513,484).
+        * I will convert this table to the wide format where there will be a total of 18 columns and 147,852 total rows.
+	Reason: In order to facilitate future joins during report creating.
+*/
+
+select
+		Encounter_ID,
+		max(case when trim(CostType) = 'DrugCost' then CostAmount end) DrugCost,
+		max(case when trim(CostType) = 'SurgeryCost' then CostAmount end) SurgeryCost,
+		max(case when trim(CostType) = 'PostSurgeryCare' then CostAmount end) PostSurgeryCare,
+		max(case when trim(CostType) = 'EducationRehab' then CostAmount end) EducationRehab,
+		max(case when trim(CostType) = 'PsychologicalSupport' then CostAmount end) PsychologicalSupport,
+		max(case when trim(CostType) = 'RoomCost' then CostAmount end) RoomCost,
+		max(case when trim(CostType) = 'CompanionAccommodation' then CostAmount end) CompanionAccommodation,
+		max(case when trim(CostType) = 'NutritionCost' then CostAmount end) NutritionCost,
+		max(case when trim(CostType) = 'RadiologyCost' then CostAmount end) RadiologyCost,
+		max(case when trim(CostType) = 'EndoscopyCost' then CostAmount end) EndoscopyCost,
+		max(case when trim(CostType) = 'AdditionalInsuranceFees' then CostAmount end) AdditionalInsuranceFees,
+		max(case when trim(CostType) = 'TotalCost' then CostAmount end) TotalCost,
+		max(case when trim(CostType) = 'InsuranceCoverage' then CostAmount end) InsuranceCoverage,
+		max(case when trim(CostType) = 'OutOfPocketCost' then CostAmount end) OutOfPocketCost,
+		max(case when trim(CostType) = 'CBC_Cost' then CostAmount end) CBC_Cost,
+		max(case when trim(CostType) = 'Chem_Cost' then CostAmount end) Chem_Cost,
+		max(case when trim(CostType) = 'Lipid_Cost' then CostAmount end) Lipid_Cost,
+        row_number() over() rrank
+from msbronze.erp_factcost
+group by Encounter_ID;
+
+/*
+	* The above query failed to execute giving 'Error code: 2013. Lost connection to MySQL server during query'.
+	* On further investigation, I figured out that the size of the table is what is the problem.
+	* On attempting to execute the above query on smaller chunks of the table, the query executes successfully.
+	* After testing, I found a sweet spot regarding the size of the chunks (370,000 rows).
+	* Beyond that MySQL looses connection to the server.
+	* So I'll transpose the data in chunks of 370,000 rows.
+	* On trying this, EACH query takes around 28 seconds to execute meaning that it will take a total of (2,513,484 / 370,000) seconds to transpose
+		the whole table which seems really inefficient.
+	* I had to look for an alternative method which requires less code writing and also less execution time.
+*/ 
+
+/*
+	* After some back and forth, I consulted AI who enlightened me that the problem was not the size of my dataset but rather, my specific query's execution time 
+		exceeded the default wait_timeout system variable limit which is 30 seconds. To fix this, I extended both the 'net_read_timeout' variable on the server side
+        and the 'DBMS connection read timeout (in seconds)' on client's side to 600 seconds'.
+				Server side: 	1. [SHOW VARIABLES LIKE '%timeout%';] -- scroll down to 'net_read_timeout' and observe what amount is indicated in the 'value' column.
+								2. [SET GLOBAL net_read_timeout = 600;] -- Run this query to increase the value observed in the step above.
+				Client's side: 1. 	'Edit' → 'Preferences' → 'SQL Editor' → 'DBMS connection read timeout interval (in seconds)' 
+									Increase it to more than the indicated amount.
+	* After doing the above, I re executed the query above but now without the 370,000 row limit.
+    * The query executed successfully taking a total of 68 seconds to execute.
+*/
+
+-- So the final cleansed data to be inserted into the mssilver.erp_factcost table will come from:
+select
+		Encounter_ID,
+		max(case when trim(CostType) = 'DrugCost' then trim(CostAmount) end) DrugCost,
+		cast(max(case when trim(CostType) = 'SurgeryCost' then trim(CostAmount) end) as decimal(10,2)) SurgeryCost, -- used cast() to reduce number of decimal places. 
+		cast(max(case when trim(CostType) = 'PostSurgeryCare' then trim(CostAmount) end) as decimal(10,2)) PostSurgeryCare, -- same to this column.
+		max(case when trim(CostType) = 'EducationRehab' then trim(CostAmount) end) EducationRehab,
+		max(case when trim(CostType) = 'PsychologicalSupport' then trim(CostAmount) end) PsychologicalSupport,
+		max(case when trim(CostType) = 'RoomCost' then trim(CostAmount) end) RoomCost,
+		max(case when trim(CostType) = 'CompanionAccommodation' then trim(CostAmount) end) CompanionAccommodation,
+		max(case when trim(CostType) = 'NutritionCost' then trim(CostAmount) end) NutritionCost,
+		max(case when trim(CostType) = 'RadiologyCost' then trim(CostAmount) end) RadiologyCost,
+		max(case when trim(CostType) = 'EndoscopyCost' then trim(CostAmount) end) EndoscopyCost,
+		max(case when trim(CostType) = 'AdditionalInsuranceFees' then trim(CostAmount) end) AdditionalInsuranceFees,
+		max(case when trim(CostType) = 'TotalCost' then trim(CostAmount) end) TotalCost,
+		cast(max(case when trim(CostType) = 'InsuranceCoverage' then trim(CostAmount) end) as decimal(10,2)) InsuranceCoverage, -- same to this column.
+		cast(max(case when trim(CostType) = 'OutOfPocketCost' then trim(CostAmount) end) as decimal(10,2)) OutOfPocketCost, -- same to this column.
+		max(case when trim(CostType) = 'CBC_Cost' then trim(CostAmount) end) CBC_Cost,
+		max(case when trim(CostType) = 'Chem_Cost' then trim(CostAmount) end) Chem_Cost,
+		max(case when trim(CostType) = 'Lipid_Cost' then trim(CostAmount) end) Lipid_Cost
+from msbronze.erp_factcost
+group by Encounter_ID;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_factencounter;
+/*
+	* This table contains information about encounters between patients and the medical centre.
+    * It is clearly a fact table because it represents events that happened.
+    * And from the presence of the multiple IDs(primary keys of other tables), it seems like it's a central fact table.
+*/
+-- _________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for duplicates.
+with cte_name as
+(
+select 
+		Encounter_ID,
+		trim(Patient_ID) Patient_ID,
+        Disease_ID,
+        ResponsibleDoctorID,
+        InsuranceKey,
+        RoomKey,
+        trim(CheckinDate) CheckinDate,
+        trim(CheckoutDate) CheckoutDate,
+        CheckinDateKey,
+        CheckoutDateKey,
+        Patient_Severity_Score,
+        trim(RadiologyType) RadiologyType,
+        RadiologyProcedureCount,
+        trim(EndoscopyType) EndoscopyType,
+        EndoscopyProcedureCount,
+        trim(CompanionPresent) CompanionPresent,
+        row_number() over	(partition by
+								Encounter_ID,
+								trim(Patient_ID),
+								Disease_ID,
+								ResponsibleDoctorID,
+								InsuranceKey,
+								RoomKey,
+								trim(CheckinDate),
+								trim(CheckoutDate),
+								CheckinDateKey,
+								CheckoutDateKey,
+								Patient_Severity_Score,
+								trim(RadiologyType),
+								RadiologyProcedureCount,
+								trim(EndoscopyType),
+								EndoscopyProcedureCount,
+								trim(CompanionPresent)
+							) row_num
+from msbronze.erp_factencounter
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: No duplicates found.
+-- _________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls
+select *
+from msbronze.erp_factencounter
+where 	Encounter_ID is null
+		or Patient_ID is null
+        or Disease_ID is null
+        or ResponsibleDoctorID is null
+        or InsuranceKey is null
+        or RoomKey is null
+        or CheckinDate is null
+        or CheckoutDate is null
+        or CheckinDateKey is null
+        or CheckoutDateKey is null
+        or Patient_Severity_Score is null
+        or RadiologyType is null
+        or RadiologyProcedureCount is null
+        or EndoscopyType is null
+        or EndoscopyProcedureCount is null
+        or CompanionPresent is null;
+-- Result: No nulls present.
+-- _________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Looking for patient IDs that are not present in the msbronze.erp_dimpatient table.
+-- Relevance: Every patient that creates an encounter at the centre should have their personal info recorded in the msbronze.erp_dimpatient table.
+select Patient_ID
+from msbronze.erp_factencounter
+where trim(Patient_ID) not in
+(
+select
+    trim(`Patient_ID`)
+from msbronze.erp_dimpatient
+);
+-- Result: ALL patients who came to the centre have their personal info stored in the msbronze.erp_dimpatient table.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Looking for Disease IDs that are not present in the msbronze.erp_dimdisease table.
+-- Relevance: Every disease a patient is diagnosed with is supposed to exist in the erp_dimdisease table unless a patient has a sickness unknown to the centre.
+select Disease_ID
+from msbronze.erp_factencounter
+where Disease_ID not in
+(
+select
+	Disease_ID
+from msbronze.erp_dimdisease
+);
+-- All the diseases that all the patients were diagnosed with at the centre exist in the msbronze.erp_dimdisease table.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Looking for ResponsibleDoctorIDs that are not present in the msbronze.erp_dimdoctor table.
+-- Relevance: Every doctor who attends to a patient at the centre is supposed to already appear in the erp_dimdoctor table.
+select ResponsibleDoctorID
+from msbronze.erp_factencounter
+where ResponsibleDoctorID not in
+(
+select
+	Doctor_ID
+from msbronze.erp_dimdoctor
+);
+-- All the doctors who attended to the patients in appearing in the msbronze.erp_factencounter table also exist in the msbronze.erp_dimdoctor table.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Looking for InsuranceKeys that are not present in the msbronze.erp_diminsurancedetails table.
+-- Relevance: Every patient's insurance type should already exist in the erp_diminsurancedetails table.
+select InsuranceKey
+from msbronze.erp_factencounter
+where InsuranceKey not in
+(
+select
+		InsuranceKey
+from msbronze.erp_diminsurancedetails
+);
+-- All insurance keys in the erp_factencounter table exist in the erp_diminsurancedetails table.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Looking for RoomKeys that are not present in the msbronze.erp_dimroom table.
+-- Relevance: The room that each patient stays in has a unique ID in the erp_dimroom table.
+
+select RoomKey
+from msbronze.erp_factencounter
+where RoomKey not in
+(
+select
+		RoomKey
+from msbronze.erp_dimroom
+);
+-- All roomKeys in the erp_factencounter table exist in the erp_dimroom table.
+-- _________________________________________________________________________________________________________________________________________________________________
+
+/*
+	* For the next 2 columns, I will first check if their values are all valid dates by converting them from strings to datetime values.
+    * If there are no invalid datetimes, I will then search for invalid scenarios. i.e. Scenarios where checkout dates come before checkin dates.
+	* If all will be well, I will have to split both of the 2 columns into 2 columns each so as to have the date and time informations separated.
+*/
+
+-- Test: Checking for invalid dates.
+select
+		cast(CheckinDate as datetime) CheckinDate,
+        cast(CheckoutDate as datetime) CheckoutDate
+from msbronze.erp_factencounter
+where cast(CheckinDate as datetime) is null or cast(CheckoutDate as datetime) is null;
+-- All string values are successfully converted to datetime values without any nulls.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for invalid dates. (Scenarios where checkout dates come before checkin dates.)
+select
+	cast(CheckinDate as datetime) CheckinDate,
+	cast(CheckoutDate as datetime) CheckoutDate
+from msbronze.erp_factencounter
+where cast(CheckoutDate as datetime) > cast(CheckinDate as datetime);
+-- No checkin dates that come after their respective checkout dates.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- For the next 2 columns: CheckinDateKey and CheckoutDateKey, since I have already checked for nulls and did not find any, there will be no transformations for these.
+-- From observing the values in these 2 columns, I can see that they come from the date values from their respective CheckinDates and CheckoutDates.
+-- What I might do is, I will map them out a fresh from their respective CheckinDate & CheckoutDate values in the final insert query.
+-- 	(Just incase there are keys that dont match their respective checkin/checkout dates.)
+-- _________________________________________________________________________________________________________________________________________________________________
+
+-- For the next column (Patient_Severity_Score), it seems like this column contains values that are percentages. 
+-- So, I have to make sure that all its values are not greater than 100.
+
+select Patient_Severity_Score
+from msbronze.erp_factencounter
+where Patient_Severity_Score > 100;
+-- Result: Nil.
+-- _________________________________________________________________________________________________________________________________________________________________
+
+-- For the next 2 columns (RadiologyType & EndoscopyType), I am going to check for distinct values in order to understand their contents. 
+select distinct RadiologyType
+from msbronze.erp_factencounter;
+-- Result: No issues detected.
+
+select distinct EndoscopyType
+from msbronze.erp_factencounter;
+-- Result: No issues detected.
+-- _________________________________________________________________________________________________________________________________________________________________
+
+/* 	
+	For the next 2 columns(RadiologyProcedureCount & EndoscopyProcedureCount), I should ensure that for every corresponding value in the columns
+	(RadiologyType & EndoscopyType) that read 'none', the value in these 2 columns should be the value 0 and vice versa.
+*/
+
+select RadiologyType, RadiologyProcedureCount
+from msbronze.erp_factencounter
+where 	trim(RadiologyType) like 'None' and RadiologyProcedureCount <> 0;
+
+select EndoscopyType, EndoscopyProcedureCount
+from msbronze.erp_factencounter
+where 	trim(EndoscopyType) like 'None' and EndoscopyProcedureCount <> 0;
+-- Result: Nil. Also the vice versa returns nil number of rows.
+-- _________________________________________________________________________________________________________________________________________________________________
+
+-- For the last column(CompanionPresent), I can see that it contains boolean type of data.
+-- So this means that this column should only contain 3 possible data at most (True, false and null). I have to check if that is the actual case.
+
+select distinct CompanionPresent
+from msbronze.erp_factencounter;
+-- Result: 2 distinct values(True and False).
+-- _________________________________________________________________________________________________________________________________________________________________
+
+
+-- Final cleansed data to be inserted into the mssilver.erp_factencounter table:
+select
+		Encounter_ID,
+		trim(Patient_ID) Patient_ID,
+        Disease_ID,
+        ResponsibleDoctorID,
+        InsuranceKey,
+        RoomKey,
+        date(cast(trim(CheckinDate) as datetime)) der_CheckinDate,
+        time(cast(trim(CheckinDate) as datetime)) der_CheckinTime,
+        date(cast(trim(checkoutDate) as datetime)) der_CheckoutDate,
+        time(cast(trim(CheckoutDate) as datetime)) der_CheckoutTime,
+        date_format(date(cast(trim(CheckinDate) as datetime)), '%Y%m%d') CheckinDateKey,
+        date_format(date(cast(trim(checkoutDate) as datetime)), '%Y%m%d') CheckoutDateKey,
+        Patient_Severity_Score,
+        trim(RadiologyType) RadiologyType,
+        RadiologyProcedureCount,
+        trim(EndoscopyType) EndoscopyType,
+        EndoscopyProcedureCount,
+        trim(CompanionPresent) CompanionPresent
+from msbronze.erp_factencounter;
+/* 
+=======================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_factlabtests
+limit 140;
+-- From the above query, I can see that it contains info about the various tests done on patients during admission and at discharge.
+-- I can also see that the table contains about 10 million rows.
+-- I will investigate to see if this table is in the long format.
+-- But before that, I will check for any duplicates or nulls.
+
+-- Test: Checking for duplicates
+with cte_name as
+(
+select 
+	Encounter_ID,
+	trim(Patient_ID) Patient_ID,
+    trim(`Phase`) `Phase`,
+    trim(LabType) LabType,
+    trim(TestName) TestName,
+    trim(TestValue) TestValue,
+    row_number() over	(partition by
+							Encounter_ID,
+							trim(Patient_ID),
+							trim(`Phase`),
+							trim(LabType),
+							trim(TestName),
+							trim(TestValue)
+						) row_num
+from msbronze.erp_factlabtests
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls
+select *
+from msbronze.erp_factlabtests
+where	Encounter_ID is null
+		or Patient_ID is null
+		or `Phase` is null
+		or LabType is null
+		or TestName is null
+		or TestValue is null;
+-- Result: No nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Investigating to see if this table is in the long format.
+
+select 	treim(TestName) TestName,
+		count(*)
+from msbronze.erp_factlabtests
+group by TestName;
+-- From the above query, I can clearly see that EACH testname has a total of 295,704 rows.This is the first sign of the table being in a long format.
+
+select 	Encounter_ID,
+		trim(`Phase`) `Phase`,
+		count(*)
+from msbronze.erp_factlabtests
+group by Encounter_ID, trim(`Phase`);
+/*
+	* From the above query, it is now clearly evident that the table is in the long format because EVERY EncounterID AND Patient_ID have a total of 70 rows.
+		(35 rows(tests) during admission and 35 rows(tests) during discharge).
+	* It can be clearly inferred that whenever a patient comes into Medsynora healthcare centre, they get tested 35 different tests during admission,
+		and 35 different tests during discharge.
+	* So this table should be converted to the wide format in order to facilitate future joins and also for easier understanding.
+		(Given the fact that the 'Labtype' column's data goes hand in hand with the 'TestName' column's data, I chose to merge the two to form the column names)
+*/
+
+-- Transposing the table to the wide format:
+select
+		Encounter_ID,
+        Patient_ID,
+        `Phase`,
+        max(case	when trim(TestName) = 'RBC (10^6/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'RBC (10^6/µl) (CBC)',
+        max(case	when trim(TestName) = 'Hemoglobin (g/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Hemoglobin (g/dl) (CBC)',
+        max(case	when trim(TestName) = 'Hematocrit (%)' and trim(`Phase`) = 'Admission' then TestValue end) 'Hematocrit (%) (CBC)',
+        max(case	when trim(TestName) = 'MCV (fL)' and trim(`Phase`) = 'Admission'  then TestValue end) 'MCV (fL) (CBC)',
+        max(case	when trim(TestName) = 'MCH (pg)' and trim(`Phase`) = 'Admission'  then TestValue end) 'MCH (pg) (CBC)',
+        max(case	when trim(TestName) = 'MCHC (g/dl)' and trim(`Phase`) = 'Admission'  then TestValue end) 'MCHC (g/dl) (CBC)',
+        max(case	when trim(TestName) = 'RDW (%)' and trim(`Phase`) = 'Admission' then TestValue end) 'RDW (%) (CBC)',
+        max(case	when trim(TestName) = 'Platelets (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Platelets (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'WBC (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'WBC (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Neutrophils_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Neutrophils_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Lymphocytes_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Lymphocytes_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Monocytes_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Monocytes_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Eosinophils_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Eosinophils_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Basophils_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Basophils_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Glucose (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Glucose (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'BUN (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'BUN (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'Creatinine (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Creatinine (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'eGFR (ml/min/1.73m^2)' and trim(`Phase`) = 'Admission' then TestValue end) 'eGFR (ml/min/1.73m^2) (Chem)',
+        max(case	when trim(TestName) = 'Sodium (mEq/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'Sodium (mEq/l) (Chem)',
+        max(case	when trim(TestName) = 'Potassium (mEq/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'Potassium (mEq/l) (Chem)',
+        max(case	when trim(TestName) = 'Chloride (mEq/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'Chloride (mEq/l) (Chem)',
+        max(case	when trim(TestName) = 'Total_protein (g/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Total_protein (g/dl) (Chem)',
+        max(case	when trim(TestName) = 'Albumin (g/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Albumin (g/dl) (Chem)',
+        max(case	when trim(TestName) = 'Uric_acid (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Uric_acid (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'ALT (U/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'ALT (U/l) (Chem)',
+        max(case	when trim(TestName) = 'AST (U/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'AST (U/l) (Chem)',
+        max(case	when trim(TestName) = 'ALP (U/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'ALP (U/l) (Chem)',
+        max(case	when trim(TestName) = 'GGT (U/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'GGT (U/l) (Chem)',
+        max(case	when trim(TestName) = 'Total_bilirubin (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Total_bilirubin (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'TotalCholesterol (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'TotalCholesterol (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'LDL (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'LDL (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'HDL (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'HDL (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'Triglycerides (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Triglycerides (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'ApoB (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'ApoB (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'CRP' and trim(`Phase`) = 'Admission' then TestValue end) 'CRP (CRP)'
+        
+from msbronze.erp_factlabtests
+group by 	Encounter_ID,
+			Patient_ID,
+			`Phase`
+having `Phase` = 'Admission'
+
+union all
+
+select
+		Encounter_ID,
+        Patient_ID,
+        `Phase`,
+        max(case	when trim(TestName) = 'RBC (10^6/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'RBC (10^6/µl) (CBC)',
+        max(case	when trim(TestName) = 'Hemoglobin (g/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Hemoglobin (g/dl) (CBC)',
+        max(case	when trim(TestName) = 'Hematocrit (%)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Hematocrit (%) (CBC)',
+        max(case	when trim(TestName) = 'MCV (fL)' and trim(`Phase`) = 'Discharge'  then trim(TestValue) end) 'MCV (fL) (CBC)',
+        max(case	when trim(TestName) = 'MCH (pg)' and trim(`Phase`) = 'Discharge'  then trim(TestValue) end) 'MCH (pg) (CBC)',
+        max(case	when trim(TestName) = 'MCHC (g/dl)' and trim(`Phase`) = 'Discharge'  then trim(TestValue) end) 'MCHC (g/dl) (CBC)',
+        max(case	when trim(TestName) = 'RDW (%)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'RDW (%) (CBC)',
+        max(case	when trim(TestName) = 'Platelets (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Platelets (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'WBC (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'WBC (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Neutrophils_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Neutrophils_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Lymphocytes_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Lymphocytes_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Monocytes_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Monocytes_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Eosinophils_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Eosinophils_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Basophils_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Basophils_abs (10^3/µl) (CBC)',
+        max(case	when trim(TestName) = 'Glucose (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Glucose (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'BUN (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'BUN (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'Creatinine (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Creatinine (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'eGFR (ml/min/1.73m^2)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'eGFR (ml/min/1.73m^2) (Chem)',
+        max(case	when trim(TestName) = 'Sodium (mEq/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Sodium (mEq/l) (Chem)',
+        max(case	when trim(TestName) = 'Potassium (mEq/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Potassium (mEq/l) (Chem)',
+        max(case	when trim(TestName) = 'Chloride (mEq/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Chloride (mEq/l) (Chem)',
+        max(case	when trim(TestName) = 'Total_protein (g/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Total_protein (g/dl) (Chem)',
+        max(case	when trim(TestName) = 'Albumin (g/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Albumin (g/dl) (Chem)',
+        max(case	when trim(TestName) = 'Uric_acid (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Uric_acid (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'ALT (U/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'ALT (U/l) (Chem)',
+        max(case	when trim(TestName) = 'AST (U/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'AST (U/l) (Chem)',
+        max(case	when trim(TestName) = 'ALP (U/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'ALP (U/l) (Chem)',
+        max(case	when trim(TestName) = 'GGT (U/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'GGT (U/l) (Chem)',
+        max(case	when trim(TestName) = 'Total_bilirubin (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Total_bilirubin (mg/dl) (Chem)',
+        max(case	when trim(TestName) = 'TotalCholesterol (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'TotalCholesterol (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'LDL (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'LDL (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'HDL (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'HDL (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'Triglycerides (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Triglycerides (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'ApoB (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'ApoB (mg/dl) (Lipids)',
+        max(case	when trim(TestName) = 'CRP' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'CRP (CRP)'        
+from msbronze.erp_factlabtests
+group by 	Encounter_ID,
+			Patient_ID,
+			`Phase`
+having `Phase` = 'Discharge';
+
+/*
+	* The final data to be inserted into the mssilver.erp_factlabtests table will come from the query above.
+	* I separated the transposition of the TestName = 'Admission' portion from the transposition of the TestName = 'Discharge' portion of the table's data because
+		when I attempt to do both the portions at a single go, I get nulls for the values of the 'Discharge' portion. But when I do them side by side and join the
+        results via a union all, all the long data gets successfully transposed to the wide data.
+========================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_factspecialtests;
+-- From the results of this query, I can see that this table contains info about the special tests done to patients during admission and at discharge.
+
+select *
+from msbronze.erp_dimspecialtest;
+/* 
+	* From the above 2 queries, I can see that the 2 tables are IDENTICAL.
+    * erp_factspecialtests has a total of 288202 entries while erp_dimspecialtest has a total of 1926 entries.
+    * Observation: erp_dimspecialtest has test results while its name from the source system claims that it is a dimension table.
+	* This means that this must be a mistake. Also, the size of the table points towards the table being a broken-off chunck of the erp_factspecialtests table.
+    * So I will merge the tables into 1 single table by using the uniona all. Then from there I will clean it and insert it into the silver layer as a single unit.
+*/
+
+select
+		SpecialTest_ID,
+        Encounter_ID,
+		trim(Test_Phase) Test_Phase,
+        trim(Test_Name) Test_Name,
+        Test_Result
+from msbronze.erp_factspecialtests
+union all
+select
+		Test_ID,
+        Encounter_ID,
+		trim(Test_Phase),
+        trim(Test_Name),
+        Test_Result
+from msbronze.erp_dimspecialtest;
+-- ____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for duplicates.
+with cte_name as
+(
+	select
+			SpecialTest_ID,
+			Encounter_ID,
+			trim(Test_Phase) Test_Phase,
+			trim(Test_Name) Test_Name,
+			Test_Result
+	from msbronze.erp_factspecialtests
+	union all
+	select
+			Test_ID,
+			Encounter_ID,
+			trim(Test_Phase),
+			trim(Test_Name),
+			Test_Result
+	from msbronze.erp_dimspecialtest
+),
+
+cte_name1 as
+(
+select
+		SpecialTest_ID,
+        Encounter_ID,
+		Test_Phase,
+        Test_Name,
+        Test_Result,
+        row_number() over	(partition by
+								SpecialTest_ID,
+								Encounter_ID,
+								Test_Phase,
+								Test_Name,
+								Test_Result
+							) row_num
+from cte_name
+)
+
+select *
+from cte_name1
+where row_num > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+with cte_name as
+(select
+		SpecialTest_ID,
+        Encounter_ID,
+		trim(Test_Phase) Test_Phase,
+        trim(Test_Name) Test_Name,
+        Test_Result
+from msbronze.erp_factspecialtests
+union all
+select
+		Test_ID,
+        Encounter_ID,
+		trim(Test_Phase),
+        trim(Test_Name),
+        Test_Result
+from msbronze.erp_dimspecialtest)
+
+select *
+from cte_name
+where	SpecialTest_ID is null
+        or Encounter_ID is null
+		or Test_Phase is null
+        or Test_Name is null
+        or Test_Result is null;
+-- Result: No nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+/*
+	* After some investigation, I found that there are some records that share the same encounter IDs and test phases yet the SpecialTest_IDs are not the same.
+		But if I also select rows with the same Test_Name values, I also see their respective SpecialTest_IDs are still not the same. This means that this is a
+        data quality issue that need solving. And since I dont have any contact with the source system experts, I will try to reconstruct this SpecialTest_ID. 
+    * From my understanding, if a patient visits the medsynora centre, they are given a unique encounter ID which they will use everywhere in the facility.
+    * With the use of this encounter ID, special tests are done to them at admission and at discharge. If multiple tests are done on them at either of these stages,
+		all the records for the various special tests done should have a common specialTest_ID indicating that the tests were all done at a single go.
+	
+	* See the sampled data below.
+        
+				SpecialTest_ID    Encounter_ID  	Test_Phase  Test_Name								Test_Result
+                    24854			2156			Admission	Throat Swab Rapid Strep Test			1.83
+					24854			2156			Admission	D-Dimer									0.86
+					24855			2156			Admission	Erythrocyte Sedimentation Rate (ESR)	27.15
+					24855			2156			Discharge	Throat Swab Rapid Strep Test			0.99
+					24856			2156			Discharge	D-Dimer									0.72
+					24857			2156			Discharge	Erythrocyte Sedimentation Rate (ESR)	16.09
+        
+	* So I will standardize the specialTest_ID column to indicate a single unique identifier for ALL the tests done to a patient at EACH phase.
+		(By taking the first specialTest_ID that appears for every patient at each phase and puting it for all the other tests done to them in the SAME phase)
+*/
+
+with cte_name as
+(select
+		SpecialTest_ID,
+        Encounter_ID,
+		trim(Test_Phase) Test_Phase,
+        trim(Test_Name) Test_Name,
+        Test_Result
+from msbronze.erp_factspecialtests
+union all
+select
+		Test_ID,
+        Encounter_ID,
+		trim(Test_Phase),
+        trim(Test_Name),
+        Test_Result
+from msbronze.erp_dimspecialtest)
+
+select 	first_value(SpecialTest_ID) over(partition by Encounter_ID, Test_Phase order by Test_Phase rows between unbounded preceding and current row) SpecialTest_ID,
+        Encounter_ID,
+		Test_Phase,
+        Test_Name,
+        Test_Result
+from cte_name;
+
+/*
+	* Result:
+				SpecialTest_ID    Encounter_ID  	Test_Phase  Test_Name								Test_Result
+                    24854			2156			Admission	Throat Swab Rapid Strep Test			1.83
+					24854			2156			Admission	D-Dimer									0.86
+					24854			2156			Admission	Erythrocyte Sedimentation Rate (ESR)	27.15
+					24855			2156			Discharge	Throat Swab Rapid Strep Test			0.99
+					24855			2156			Discharge	D-Dimer									0.72
+					24855			2156			Discharge	Erythrocyte Sedimentation Rate (ESR)	16.09
+	* This looks much more cleaner and organized.
+*/
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for the distinct values in the Test_Phase column
+-- Expectation: 2 distinct values ('Admission' & 'Discharge')
+
+with cte_name as
+(select
+		SpecialTest_ID,
+        Encounter_ID,
+		trim(Test_Phase) Test_Phase,
+        trim(Test_Name) Test_Name,
+        Test_Result
+from msbronze.erp_factspecialtests
+union all
+select
+		Test_ID,
+        Encounter_ID,
+		trim(Test_Phase),
+        trim(Test_Name),
+        Test_Result
+from msbronze.erp_dimspecialtest),
+
+cte_name1 as
+(
+select 	first_value(SpecialTest_ID) over(partition by Encounter_ID, Test_Phase order by Test_Phase rows between unbounded preceding and current row) SpecialTest_ID,
+        Encounter_ID,
+		Test_Phase,
+        Test_Name,
+        Test_Result
+from cte_name
+)
+
+select distinct Test_Phase
+from cte_name1;
+-- Result: As per expectation.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final data to be inserted into the mssilver.erp_factspecialtests table:
+with cte_name as
+(select
+		SpecialTest_ID,
+        Encounter_ID,
+		trim(Test_Phase) Test_Phase,
+        trim(Test_Name) Test_Name,
+        Test_Result
+from msbronze.erp_factspecialtests
+union all
+select
+		Test_ID,
+        Encounter_ID,
+		trim(Test_Phase),
+        trim(Test_Name),
+        Test_Result
+from msbronze.erp_dimspecialtest)
+
+select 	first_value(SpecialTest_ID) over(partition by Encounter_ID, Test_Phase order by Test_Phase rows between unbounded preceding and current row) SpecialTest_ID,
+        Encounter_ID,
+		Test_Phase,
+        Test_Name,
+        Test_Result
+from cte_name;
+/*
+========================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_facttreatment;
+/* 
+	* From looking through the table above, I see that it has fact details of patients including which type of treatment each received and the quantity of medication
+		that each received.
+*/
+select *
+from msbronze.erp_facttreatment;
+
+select *
+from msbronze.erp_dimtreatment;
+
+select *
+from msbronze.erp_facttreatmentcost;
+/*
+	* By looking at the 3 tables above, it is evident that erp_dimtreatment and erp_facttreatmentcost were one table but somehow it was broken into these 2 tables
+		along the columns. And furthermore, this initial table before it was broken, was a part of the table erp_facttreatment. (broken along the rows).
+	* See illustration below. (I have shortened the column names so that they can fit in one single view.)
+
+erp_facttreatment table:
+EncrID   TreatID  TreatType  TreatName        FolUp   Complics   DBox_Use   TherSess   DrgCst   SurgCst   PSeCst   EduRehCst   HosDrgQuant  DisDrgQuant  TtlDrg_Quant
+2156	  3333	    Drug	 Penicillin	       Yes	    No	      12	       0	   180	     0	        0	      0	         5	         7	           12
+2156	  3434	    Drug	 Ibuprofen	       No	    Yes	      1	           0	   10	     0	        0	      0	         3	         7	           10
+2156	  3707	   Surgery	 Tonsillectomy	   Yes	    No	      0	           0	   0	    18262	   715	      0	         0	         0	            0
+
+
+erp_dimtreatment table:
+EncrID	 TreatID  TreatType  TreatName	      FolUp	  Complics	 DBox_Use	 TherSess
+2156	  3337	    Drug	 Statins	       Yes	    No	      1	           0
+2156	  3325	    Drug	 Aspirin	       Yes	    No	      1	           0
+2156	  3336	    Drug	 Cilostazol	       No	    Yes	      1	           0
+
+
+erp_facttreatmentcost table:
+EncrID	TreatID																		   DrgCst	SurgCst	  PSeCst   EduRehCst   HosDrgQuant	DisDrgQuant	 TtlDrg_Quant
+2156	 3337																			50		  0			0		  0				5			22			27
+2156	 3325																			5		  0			0		  0				3			24			27
+2156	 3336																			60		  0			0		  0				5			18			23
+
+	* So what I will do is, I will join the table erp_facttreatmentcost to the table erp_dimtreatment and then join the resultant table to the 
+		erp_facttreatment table via a union all.
+	* It is only after this, that I will clean the resultant table and insert it into the silver layer.
+*/
+
+-- Joining the table erp_facttreatmentcost to the table erp_dimtreatment:
+select
+		DT.Encounter_ID,
+        DT.Treatment_ID,
+        trim(DT.Treatment_Type) Treatment_Type,
+        trim(DT.Treatment_Type) Treatment_Type,
+        trim(DT.Follow_Up) Follow_Up,
+        trim(DT.Complications) Complications,
+        DT.Drug_Boxes_Used,
+        DT.Therapy_Sessions,
+        FTC.Drug_Cost,
+        FTC.Surgery_Cost,
+        FTC.Post_Surgery_Care_Cost,
+        FTC.Education_Rehab_Cost,
+        FTC.Hospital_Drug_Quantity,
+        FTC.Discharge_Drug_Quantity,
+        FTC.Total_Drug_Quantity
+from msbronze.erp_dimtreatment DT
+join msbronze.erp_facttreatmentcost FTC
+	on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID;
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Joining the results from the above merge to the erp_facttreatment table:
+
+select
+		Encounter_ID,
+        Treatment_ID,
+        trim(Treatment_Type) Treatment_Type,
+        trim(Treatment_Name) Treatment_Name,
+        trim(Follow_Up) Follow_Up,
+        trim(Complications) Complications,
+		Drug_Boxes_Used,
+        Therapy_Sessions,
+        Drug_Cost,
+        Surgery_Cost,
+        Post_Surgery_Care_Cost,
+        Education_Rehab_Cost,
+        Hospital_Drug_Quantity,
+        Discharge_Drug_Quantity,
+        Total_Drug_Quantity        
+from msbronze.erp_facttreatment
+
+union all
+
+select
+		DT.Encounter_ID,
+        DT.Treatment_ID,
+        trim(DT.Treatment_Type) Treatment_Type,
+        trim(DT.Treatment_Type) Treatment_Type,
+        trim(DT.Follow_Up) Follow_Up,
+        trim(DT.Complications) Complications,
+        DT.Drug_Boxes_Used,
+        DT.Therapy_Sessions,
+        FTC.Drug_Cost,
+        FTC.Surgery_Cost,
+        FTC.Post_Surgery_Care_Cost,
+        FTC.Education_Rehab_Cost,
+        FTC.Hospital_Drug_Quantity,
+        FTC.Discharge_Drug_Quantity,
+        FTC.Total_Drug_Quantity
+from msbronze.erp_dimtreatment DT
+join msbronze.erp_facttreatmentcost FTC
+	on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID;
+    
+-- The result from the above query is now the data I am going to clean and then insert into the silver layer.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+
+-- Test: Checking for duplicates
+with cte_name as
+(
+select
+		Encounter_ID,
+        Treatment_ID,
+        trim(Treatment_Type) Treatment_Type,
+        trim(Treatment_Name) Treatment_Name,
+        trim(Follow_Up) Follow_Up,
+        trim(Complications) Complications,
+		Drug_Boxes_Used,
+        Therapy_Sessions,
+        Drug_Cost,
+        Surgery_Cost,
+        Post_Surgery_Care_Cost,
+        Education_Rehab_Cost,
+        Hospital_Drug_Quantity,
+        Discharge_Drug_Quantity,
+        Total_Drug_Quantity        
+from msbronze.erp_facttreatment
+
+union all
+
+select
+		DT.Encounter_ID,
+        DT.Treatment_ID,
+        trim(DT.Treatment_Type) Treatment_Type,
+        trim(DT.Treatment_Name) Treatment_Name,
+        trim(DT.Follow_Up) Follow_Up,
+        trim(DT.Complications) Complications,
+        DT.Drug_Boxes_Used,
+        DT.Therapy_Sessions,
+        FTC.Drug_Cost,
+        FTC.Surgery_Cost,
+        FTC.Post_Surgery_Care_Cost,
+        FTC.Education_Rehab_Cost,
+        FTC.Hospital_Drug_Quantity,
+        FTC.Discharge_Drug_Quantity,
+        FTC.Total_Drug_Quantity
+from msbronze.erp_dimtreatment DT
+join msbronze.erp_facttreatmentcost FTC
+	on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+),
+
+cte_name1 as
+(
+select 
+		*,
+        row_number() over	(partition by
+								Encounter_ID,
+								Treatment_ID,
+								Treatment_Type,
+								Treatment_Name,
+								Follow_Up,
+								Complications,
+								Drug_Boxes_Used,
+								Therapy_Sessions,
+								Drug_Cost,
+								Surgery_Cost,
+								Post_Surgery_Care_Cost,
+								Education_Rehab_Cost,
+								Hospital_Drug_Quantity,
+								Discharge_Drug_Quantity,
+								Total_Drug_Quantity
+							) row_num
+from cte_name
+)
+
+select *
+from cte_name1
+where row_num > 1;
+-- Result: Only 4 rows.
+
+-- The following query removes the duplicates from the above result:
+
+with cte_name as
+(
+select
+	Encounter_ID,
+	Treatment_ID,
+	trim(Treatment_Type) Treatment_Type,
+	trim(Treatment_Name) Treatment_Name,
+	trim(Follow_Up) Follow_Up,
+	trim(Complications) Complications,
+	Drug_Boxes_Used,
+	Therapy_Sessions,
+	Drug_Cost,
+	Surgery_Cost,
+	Post_Surgery_Care_Cost,
+	Education_Rehab_Cost,
+	Hospital_Drug_Quantity,
+	Discharge_Drug_Quantity,
+	Total_Drug_Quantity        
+from msbronze.erp_facttreatment
+
+union all
+
+select
+	DT.Encounter_ID,
+	DT.Treatment_ID,
+	trim(DT.Treatment_Type) Treatment_Type,
+	trim(DT.Treatment_Name) Treatment_Name,
+	trim(DT.Follow_Up) Follow_Up,
+	trim(DT.Complications) Complications,
+	DT.Drug_Boxes_Used,
+	DT.Therapy_Sessions,
+	FTC.Drug_Cost,
+	FTC.Surgery_Cost,
+	FTC.Post_Surgery_Care_Cost,
+	FTC.Education_Rehab_Cost,
+	FTC.Hospital_Drug_Quantity,
+	FTC.Discharge_Drug_Quantity,
+	FTC.Total_Drug_Quantity
+from msbronze.erp_dimtreatment DT
+join msbronze.erp_facttreatmentcost FTC
+	on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+),
+
+cte_name1 as
+(
+select 
+		*,
+        row_number() over	(partition by
+								Encounter_ID,
+								Treatment_ID,
+								Treatment_Type,
+								Treatment_Name,
+								Follow_Up,
+								Complications,
+								Drug_Boxes_Used,
+								Therapy_Sessions,
+								Drug_Cost,
+								Surgery_Cost,
+								Post_Surgery_Care_Cost,
+								Education_Rehab_Cost,
+								Hospital_Drug_Quantity,
+								Discharge_Drug_Quantity,
+								Total_Drug_Quantity
+							) row_num
+from cte_name
+)
+
+select
+	Encounter_ID,
+	Treatment_ID,
+	Treatment_Type,
+	Treatment_Name,
+	Follow_Up,
+	Complications,
+	Drug_Boxes_Used,
+	Therapy_Sessions,
+	Drug_Cost,
+	Surgery_Cost,
+	Post_Surgery_Care_Cost,
+	Education_Rehab_Cost,
+	Hospital_Drug_Quantity,
+	Discharge_Drug_Quantity,
+	Total_Drug_Quantity
+from cte_name1
+where row_num = 1;
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls
+with cte_name as
+(
+select
+		Encounter_ID,
+        Treatment_ID,
+        trim(Treatment_Type) Treatment_Type,
+        trim(Treatment_Name) Treatment_Name,
+        trim(Follow_Up) Follow_Up,
+        trim(Complications) Complications,
+		Drug_Boxes_Used,
+        Therapy_Sessions,
+        Drug_Cost,
+        Surgery_Cost,
+        Post_Surgery_Care_Cost,
+        Education_Rehab_Cost,
+        Hospital_Drug_Quantity,
+        Discharge_Drug_Quantity,
+        Total_Drug_Quantity        
+from msbronze.erp_facttreatment
+
+union all
+
+select
+		DT.Encounter_ID,
+        DT.Treatment_ID,
+        trim(DT.Treatment_Type) Treatment_Type,
+        trim(DT.Treatment_Name) Treatment_Name,
+        trim(DT.Follow_Up) Follow_Up,
+        trim(DT.Complications) Complications,
+        DT.Drug_Boxes_Used,
+        DT.Therapy_Sessions,
+        FTC.Drug_Cost,
+        FTC.Surgery_Cost,
+        FTC.Post_Surgery_Care_Cost,
+        FTC.Education_Rehab_Cost,
+        FTC.Hospital_Drug_Quantity,
+        FTC.Discharge_Drug_Quantity,
+        FTC.Total_Drug_Quantity
+from msbronze.erp_dimtreatment DT
+join msbronze.erp_facttreatmentcost FTC
+	on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+),
+
+cte_name1 as
+(
+select 
+		*,
+        row_number() over	(partition by
+								Encounter_ID,
+								Treatment_ID,
+								Treatment_Type,
+								Treatment_Name,
+								Follow_Up,
+								Complications,
+								Drug_Boxes_Used,
+								Therapy_Sessions,
+								Drug_Cost,
+								Surgery_Cost,
+								Post_Surgery_Care_Cost,
+								Education_Rehab_Cost,
+								Hospital_Drug_Quantity,
+								Discharge_Drug_Quantity,
+								Total_Drug_Quantity
+							) row_num
+from cte_name
+),
+
+cte_name2 as
+(
+select
+		Encounter_ID,
+		Treatment_ID,
+		Treatment_Type,
+		Treatment_Name,
+		Follow_Up,
+		Complications,
+		Drug_Boxes_Used,
+		Therapy_Sessions,
+		Drug_Cost,
+		Surgery_Cost,
+		Post_Surgery_Care_Cost,
+		Education_Rehab_Cost,
+		Hospital_Drug_Quantity,
+		Discharge_Drug_Quantity,
+		Total_Drug_Quantity
+from cte_name1
+where row_num = 1
+)
+
+select *
+from cte_name2
+where 	Encounter_ID is null
+		or Treatment_ID is null
+		or Treatment_Type is null
+		or Treatment_Name is null
+		or Follow_Up is null
+		or Complications is null
+		or Drug_Boxes_Used is null
+		or Therapy_Sessions is null
+		or Drug_Cost is null
+		or Surgery_Cost is null
+		or Post_Surgery_Care_Cost is null
+		or Education_Rehab_Cost is null
+		or Hospital_Drug_Quantity is null
+		or Discharge_Drug_Quantity is null
+		or Total_Drug_Quantity is null;
+-- Result: No nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- There are some records whose Treatment_ID is 'none'.
+
+with cte_name as
+(
+select
+		Encounter_ID,
+        Treatment_ID,
+        trim(Treatment_Type) Treatment_Type,
+        trim(Treatment_Name) Treatment_Name,
+        trim(Follow_Up) Follow_Up,
+        trim(Complications) Complications,
+		Drug_Boxes_Used,
+        Therapy_Sessions,
+        Drug_Cost,
+        Surgery_Cost,
+        Post_Surgery_Care_Cost,
+        Education_Rehab_Cost,
+        Hospital_Drug_Quantity,
+        Discharge_Drug_Quantity,
+        Total_Drug_Quantity        
+from msbronze.erp_facttreatment
+
+union all
+
+select
+		DT.Encounter_ID,
+        DT.Treatment_ID,
+        trim( DT.Treatment_Type) Treatment_Type,
+        trim(DT.Treatment_Name) Treatment_Name,
+        trim(DT.Follow_Up) Follow_Up,
+        trim(DT.Complications) Complications,
+        DT.Drug_Boxes_Used,
+        DT.Therapy_Sessions,
+        FTC.Drug_Cost,
+        FTC.Surgery_Cost,
+        FTC.Post_Surgery_Care_Cost,
+        FTC.Education_Rehab_Cost,
+        FTC.Hospital_Drug_Quantity,
+        FTC.Discharge_Drug_Quantity,
+        FTC.Total_Drug_Quantity
+from msbronze.erp_dimtreatment DT
+join msbronze.erp_facttreatmentcost FTC
+	on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+),
+
+cte_name1 as
+(
+select 
+		*,
+        row_number() over	(partition by
+								Encounter_ID,
+								Treatment_ID,
+								Treatment_Type,
+								Treatment_Name,
+								Follow_Up,
+								Complications,
+								Drug_Boxes_Used,
+								Therapy_Sessions,
+								Drug_Cost,
+								Surgery_Cost,
+								Post_Surgery_Care_Cost,
+								Education_Rehab_Cost,
+								Hospital_Drug_Quantity,
+								Discharge_Drug_Quantity,
+								Total_Drug_Quantity
+							) row_num
+from cte_name
+)
+
+select
+		Encounter_ID,
+		Treatment_ID,
+		Treatment_Type,
+		Treatment_Name,
+		Follow_Up,
+		Complications,
+		Drug_Boxes_Used,
+		Therapy_Sessions,
+		Drug_Cost,
+		Surgery_Cost,
+		Post_Surgery_Care_Cost,
+		Education_Rehab_Cost,
+		Hospital_Drug_Quantity,
+		Discharge_Drug_Quantity,
+		Total_Drug_Quantity
+from cte_name1
+where row_num = 1 and Treatment_ID like '%none%';
+-- Result: There are multiple records(23) whose data is missing. Only their Encounter_ID is present. The rest of the data is 'none', and zeros for the int columns.
+-- Being that they are only 13 records and I dont have any contact with the source system experts, I will exclude them from the final cleansed data.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final data to be inserted into the mssilver.erp_facttreatment table:
+
+with cte_name as
+(
+select
+		Encounter_ID,
+        Treatment_ID,
+        trim(Treatment_Type) Treatment_Type,
+        trim(Treatment_Name) Treatment_Name,
+        trim(Follow_Up) Follow_Up,
+        trim(Complications) Complications,
+		Drug_Boxes_Used,
+        Therapy_Sessions,
+        Drug_Cost,
+        Surgery_Cost,
+        Post_Surgery_Care_Cost,
+        Education_Rehab_Cost,
+        Hospital_Drug_Quantity,
+        Discharge_Drug_Quantity,
+        Total_Drug_Quantity        
+from msbronze.erp_facttreatment
+
+union all
+
+select
+		DT.Encounter_ID,
+        DT.Treatment_ID,
+        trim( DT.Treatment_Type) Treatment_Type,
+        trim(DT.Treatment_Name) Treatment_Name,
+        trim(DT.Follow_Up) Follow_Up,
+        trim(DT.Complications) Complications,
+        DT.Drug_Boxes_Used,
+        DT.Therapy_Sessions,
+        FTC.Drug_Cost,
+        FTC.Surgery_Cost,
+        FTC.Post_Surgery_Care_Cost,
+        FTC.Education_Rehab_Cost,
+        FTC.Hospital_Drug_Quantity,
+        FTC.Discharge_Drug_Quantity,
+        FTC.Total_Drug_Quantity
+from msbronze.erp_dimtreatment DT
+join msbronze.erp_facttreatmentcost FTC
+	on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+),
+
+cte_name1 as
+(
+select 
+		*,
+        row_number() over	(partition by
+								Encounter_ID,
+								Treatment_ID,
+								Treatment_Type,
+								Treatment_Name,
+								Follow_Up,
+								Complications,
+								Drug_Boxes_Used,
+								Therapy_Sessions,
+								Drug_Cost,
+								Surgery_Cost,
+								Post_Surgery_Care_Cost,
+								Education_Rehab_Cost,
+								Hospital_Drug_Quantity,
+								Discharge_Drug_Quantity,
+								Total_Drug_Quantity
+							) row_num
+from cte_name
+)
+
+select
+		Encounter_ID,
+		Treatment_ID,
+		Treatment_Type,
+		Treatment_Name,
+		Follow_Up,
+		Complications,
+		Drug_Boxes_Used,
+		Therapy_Sessions,
+		Drug_Cost,
+		Surgery_Cost,
+		Post_Surgery_Care_Cost,
+		Education_Rehab_Cost,
+		Hospital_Drug_Quantity,
+		Discharge_Drug_Quantity,
+		Total_Drug_Quantity
+from cte_name1
+where row_num = 1 and Treatment_ID not like '%none%';
+/*
+========================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_factvitals;
+-- From a quick survey of the contents of the table above, I can see that it contains info on the vitals of patients like heart rates and blood pressure.
+
+-- Test: Checking for duplicates.
+with cte_name as
+(
+select 	
+		Encounter_ID,
+		trim(Patient_ID) Patient_ID,
+		trim(`Phase`) `Phase`,
+		HeartRate,
+		Temperature,
+		SystolicBP,
+		DiastolicBP,
+		RespRate,
+		O2Sat,
+		row_number() over	(partition by
+								Encounter_ID,
+								trim(Patient_ID),
+								trim(`Phase`),
+								HeartRate,
+								Temperature,
+								SystolicBP,
+								DiastolicBP,
+								RespRate,
+								O2Sat
+							) row_num
+from msbronze.erp_factvitals
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+
+select *
+from msbronze.erp_factvitals
+where	Encounter_ID is null
+		or Patient_ID is null
+		or Phase is null
+		or HeartRate is null
+		or Temperature is null
+		or SystolicBP is null
+		or DiastolicBP is null
+		or RespRate is null
+		or O2Sat is null;
+-- Result: No nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for the distinct values in the 'phase' column.
+-- Expectation: 2 distinct values. ('Admission' & 'Discharge')
+
+select distinct trim(`phase`)
+from msbronze.erp_factvitals;
+-- Result: 2 distinct values: 'Admission' & 'Discharge'.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking if any of the integer & decimal columns have negative numbered results.
+-- Expectation: no negative values.
+
+select *
+from msbronze.erp_factvitals
+where 	HeartRate < 0
+		or Temperature < 0
+        or SystolicBP < 0
+        or DiastolicBP < 0
+        or RespRate < 0
+        or O2Sat < 0;
+-- Result: As per expectation.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final data to be inserted into the mssilver.erp_factvitals table:
+
+select 
+		Encounter_ID,
+		trim(Patient_ID) Patient_ID,
+		trim(`Phase`) `Phase`,
+		HeartRate,
+		Temperature,
+		SystolicBP,
+		DiastolicBP,
+		RespRate,
+		O2Sat
+from msbronze.erp_factvitals;
+/*
+========================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_patient_allergy;
+-- From viewing this table, I can clearly see that the table indicates the various allergies that each patient has.
+/*
+	* And by looking more keenly, I can see that some patients have the same exact allergy recorded twice. This indicates the presence of duplicates.
+	* It seems that every time a patient visits the MedSynora medical centre, their allergy details are recorded even if they are a repeat patient hence the duplicates.
+*/
+
+-- Test: Checking for duplicates
+with cte_name as
+(
+select
+		trim(Patient_ID) Patient_ID,
+        AllergyID,
+        row_number() over(partition by Patient_ID, AllergyID) row_num
+from msbronze.erp_patient_allergy
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: 221987 duplicate rows.
+-- Coincidentally, EVERY patient's allergy information appears EXACTLY twice.
+-- This means that after removing the duplicates, the table wiil be reduced by exactly a half along the rows to a total of 221987 distinct rows.
+
+-- Removing the duplicates:
+with cte_name as
+(
+select
+		trim(Patient_ID) Patient_ID,
+        AllergyID,
+        row_number() over(partition by trim(Patient_ID), AllergyID) row_num
+from msbronze.erp_patient_allergy
+)
+
+select *
+from cte_name
+where row_num = 1;
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls:
+
+with cte_name as
+(
+select
+		trim(Patient_ID) Patient_ID,
+        AllergyID,
+        row_number() over(partition by trim(Patient_ID), AllergyID) row_num
+from msbronze.erp_patient_allergy
+),
+
+cte_name1 as
+(
+select
+		Patient_ID,
+        AllergyID
+from cte_name
+where row_num = 1
+)
+
+select *
+from cte_name1
+where 	Patient_ID is null
+		or AllergyID is null;
+-- Result: No nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for negative AllergyIDs.
+-- Expectation: No negative AllergyIDs.
+
+select *
+from msbronze.erp_patient_allergy
+where AllergyID < 0;
+-- Result: As per expectation.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final data to be inserted into the mssilver.erp_patient_allergy table:
+
+with cte_name as
+(
+select
+		trim(Patient_ID) Patient_ID,
+        AllergyID,
+        row_number() over(partition by trim(Patient_ID), AllergyID) row_num
+from msbronze.erp_patient_allergy
+)
+
+select
+		Patient_ID,
+        AllergyID
+from cte_name
+where row_num = 1;
+/*
+========================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_patient_chronicdisease;
+-- From viewing this table, I can clearly see that the table indicates the various chronic diseases that each patient had.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for duplicates
+with cte_name as
+(
+select
+		trim(Patient_ID) Patient_ID,
+        ChronicDiseaseID,
+        row_number() over(partition by trim(Patient_ID), ChronicDiseaseID) row_num
+from msbronze.erp_patient_chronicdisease
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: 0 duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls:
+select *
+from msbronze.erp_patient_chronicdisease
+where 	Patient_ID is null
+		or ChronicDiseaseID is null;
+-- Result: No nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for negative ChronicDiseaseIDs.
+-- Expectation: No negative ChronicDiseaseIDs.
+
+select *
+from msbronze.erp_patient_chronicdisease
+where ChronicDiseaseID < 0;
+-- Result: As per expectation.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Final data to be inserted into the mssilver.erp_patient_chronicdisease table:
+
+select
+		trim(Patient_ID) Patient_ID,
+        ChronicDiseaseID
+from msbronze.erp_patient_chronicdisease;
+/*
+========================================================================================================================================================================
+*/
