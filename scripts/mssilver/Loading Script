@@ -1,1 +1,1109 @@
+/*
+=======================================================================================================================================================================
+		LOADING THE SILVER LAYER (mssilver)
+=======================================================================================================================================================================
+Script Purpose:
+	* The following stored procedure is responsible for loading the silver layer with cleaned and standardized data.
+    * For each table, the already existing data is first truncated and then the new fresh data is inserted. (Full load)
+	* The stored procedure also contains variables that are responsible to indicate how long it takes for data to be inserted into each table. 
 
+How to utilize the stored procedure:
+	* Execute the following query [call mssilver.load_silver;]
+    
+Warning:
+	* Executing the stored procedure will truncate all existing data before re-inserting new data. So make sure everything is okay at the source system first.
+=======================================================================================================================================================================
+*/
+
+Delimiter $$
+	create procedure mssilver.load_silver()
+
+		begin
+
+			declare bridgeencounteradditionalservice_start_time time;
+			declare bridgeencounteradditionalservice_end_time time;
+
+			declare bridgeencounterdoctor_start_time time;
+			declare bridgeencounterdoctor_end_time time;
+
+			declare dimadditionalservice_start_time time;
+			declare dimadditionalservice_end_time time;
+
+			declare dimallergy_start_time time;
+			declare dimallergy_end_time time;
+
+			declare dimchronicdisease_start_time time;
+			declare dimchronicdisease_end_time time;
+
+			declare dimdate_start_time time;
+			declare dimdate_end_time time;
+
+			declare dimdisease_start_time time;
+			declare dimdisease_end_time time;
+
+			declare dimdoctor_start_time time;
+			declare dimdoctor_end_time time;
+
+			declare diminsurancedetails_start_time time;
+			declare diminsurancedetails_end_time time;
+
+			declare diminsurancepackages_start_time time;
+			declare diminsurancepackages_end_time time;
+
+			declare dimpatient_start_time time;
+			declare dimpatient_end_time time;
+
+			declare dimroom_start_time time;
+			declare dimroom_end_time time;
+
+			declare factcost_start_time time;
+			declare factcost_end_time time;
+
+			declare factencounter_start_time time;
+			declare factencounter_end_time time;
+
+			declare factlabtests_start_time time;
+			declare factlabtests_end_time time;
+
+			declare factspecialtests_start_time time;
+			declare factspecialtests_end_time time;
+
+			declare facttreatment_start_time time;
+			declare facttreatment_end_time time;
+
+			declare factvitals_start_time time;
+			declare factvitals_end_time time;
+
+			declare patient_allergy_start_time time;
+			declare patient_allergy_end_time time;
+
+			declare patient_chronicdisease_start_time time;
+			declare patient_chronicdisease_end_time time;
+/*
+========================================================================================================================================================================
+*/
+			-- 1.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_BridgeEncounterAdditionalService table:
+
+			set bridgeencounteradditionalservice_start_time = now();
+
+				truncate mssilver.erp_bridgeencounteradditionalservice;
+				insert into mssilver.erp_bridgeencounteradditionalservice
+				(
+					Encounter_ID,
+					AdditionalServiceID
+				)
+				select 
+						Encounter_ID,
+						AdditionalServiceID
+				from msbronze.erp_bridgeencounteradditionalservice;
+
+			set bridgeencounteradditionalservice_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 2.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_bridgeencounterdoctor table:
+
+			set bridgeencounterdoctor_start_time = now();
+
+				truncate mssilver.erp_bridgeencounterdoctor;
+				insert into mssilver.erp_bridgeencounterdoctor
+				(
+					Encounter_ID,
+					Doctor_ID
+				)
+				select
+					Encounter_ID,
+					Doctor_ID
+				from msbronze.erp_bridgeencounterdoctor;
+
+			set bridgeencounterdoctor_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 3.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_dimadditionalservice table:
+
+			set dimadditionalservice_start_time = now();
+
+				truncate mssilver.erp_dimadditionalservice;
+				insert into mssilver.erp_dimadditionalservice
+				(
+					AdditionalServiceID,
+					ServiceName
+				)
+				select
+					AdditionalServiceID,
+					trim(ServiceName) ServiceName
+				from msbronze.erp_dimadditionalservice;
+
+			set dimadditionalservice_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 4.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_dimallergy table
+
+			set dimallergy_start_time = now();
+
+				truncate mssilver.erp_dimallergy;
+				insert into mssilver.erp_dimallergy
+				(
+					AllergyID,
+					AllergyName
+				)
+				select
+					AllergyID,
+					trim(AllergyName) AllergyName
+				from msbronze.erp_dimallergy
+				order by AllergyID;
+
+			set dimallergy_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 5.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_dimchronicdisease table:
+
+			set dimchronicdisease_start_time = now();
+
+				truncate mssilver.erp_dimchronicdisease;
+				insert into mssilver.erp_dimchronicdisease
+				(
+					ChronicDiseaseID,
+					ChronicDiseaseName
+				)
+				select
+					ChronicDiseaseID,
+					trim(ChronicDiseaseName) ChronicDiseaseName
+				from msbronze.erp_dimchronicdisease;
+
+			set dimchronicdisease_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 6.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_dimdate table:
+
+			set dimdate_start_time = now();
+
+				truncate mssilver.erp_dimdate;
+				insert into mssilver.erp_dimdate
+				(
+					`Date`,
+					DateKey,
+					`Year`,
+					`Month`,
+					`day`,
+					`quarter`,
+					weekday,
+					Date_String
+				)
+				select
+						`Date`,
+						date_format(`Date`, '%d%m%Y') DateKey,
+						year(`Date`) `Year`,
+						monthname(`Date`) `Month`,
+						day(`Date`) `day`,
+						case 	when quarter(`Date`) = 1 then '1st'
+								when quarter(`Date`) = 2 then '2nd'
+								when quarter(`Date`) = 3 then '3rd'
+								when quarter(`Date`) = 4 then '4th'
+						end `quarter`,
+						dayofweek(`Date`) weekday,
+						date_format(`Date`, '%d-%m-%Y') Date_String
+				from msbronze.erp_dimdate;
+
+			set dimdate_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 7.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_dimdisease table:
+
+			set dimdisease_start_time = now();
+
+				truncate mssilver.erp_dimdisease;
+				insert into mssilver.erp_dimdisease
+				(
+					Disease_ID,
+					`Admission Diagnosis`,
+					`Disease Type`,
+					`Disease Severity`,
+					`Medical Unit`
+				)
+				select
+					Disease_ID,
+					trim(`Admission Diagnosis`) `Admission Diagnosis`,
+					trim(`Disease Type`) `Disease Type`,
+					`Disease Severity`,
+					trim(`Medical Unit`) `Medical Unit`
+				from msbronze.erp_dimdisease;
+
+			set dimdisease_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 8.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_dimdoctor table:
+
+			set dimdoctor_start_time = now();
+
+				truncate mssilver.erp_dimdoctor;
+				insert into mssilver.erp_dimdoctor
+				(
+					Doctor_ID,
+					`Doctor Name`,
+					`Doctor Surname`,
+					`Doctor Title`,
+					`Doctor Nationality`,
+					`Medical Unit`,
+					`Max Patient Count`
+				)
+				select
+					Doctor_ID,
+					trim(`Doctor Name`) `Doctor Name`,
+					trim(`Doctor Surname`) `Doctor Surname`,
+					trim(`Doctor Title`) `Doctor Title`,
+					trim(`Doctor Nationality`) `Doctor Nationality`,
+					trim(`Medical Unit`) `Medical Unit`,
+					`Max Patient Count`
+				from msbronze.erp_dimdoctor;
+
+			set dimdoctor_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 9.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_diminsurancedetails table:
+
+			set diminsurancedetails_start_time = now();
+
+				truncate mssilver.erp_diminsurancedetails;
+				insert into mssilver.erp_diminsurancedetails
+				(
+					InsuranceKey,
+					`Insurance Plan Name`,
+					`Coverage Limit`,
+					Deductible
+				)
+				select
+						InsuranceKey,
+						trim(`Insurance Plan Name`) `Insurance Plan Name`,
+						`Coverage Limit`,
+						Deductible
+				from msbronze.erp_diminsurancedetails;
+
+			set diminsurancedetails_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 10.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_diminsurancepackages table:
+
+			set diminsurancepackages_start_time = now();
+
+				truncate mssilver.erp_diminsurancepackages;
+				insert into mssilver.erp_diminsurancepackages
+				(
+					`Conditions Partially Covered`,
+					Basic,
+					Standard,
+					Premium
+				)
+				select
+					trim(`Conditions Partially Covered`) `Conditions Partially Covered`,
+					case 	when trim(Basic) = '1' then 'Yes'
+							when trim(Basic) = 'info absent' then 'info absent'
+							else 'No'
+					end Basic,
+					case 	when trim(Standard) = '1' then 'Yes'
+							when trim(Standard) = 'info absent' then 'info absent'
+							else 'No'
+					end Standard,
+					case 	when trim(Premium) = '1' then 'Yes'
+							when trim(Premium) = 'info absent' then 'info absent'
+							else 'No'
+					end Premium
+				from msbronze.erp_diminsurancepackages;
+
+			set diminsurancepackages_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 11.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_dimpatient table:
+
+			set dimpatient_start_time = now();
+
+				truncate mssilver.erp_dimpatient;
+				insert into mssilver.erp_dimpatient
+				(
+					Patient_ID,
+					`First Name`,
+					`Last Name`,
+					Gender,
+					`Birth Date`,
+					Height,
+					Weight,
+					`Marital Status`,
+					Nationality,
+					`Blood Type`
+				)
+				select
+					trim(`Patient_ID`) `Patient_ID`,
+					trim(`First Name`) `First Name`,
+					trim(`Last Name`) `Last Name`,
+					trim(`Gender`) `Gender`,
+					cast(trim(`Birth Date`) as date) `Birth Date`,
+					Height,
+					Weight,
+					trim(`Marital Status`) `Marital Status`,
+					trim(Nationality) Nationality,
+					trim(`Blood Type`) `Blood Type`
+				from msbronze.erp_dimpatient;
+
+			set dimpatient_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 12.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_dimroom table:
+
+			set dimroom_start_time = now();
+
+				truncate mssilver.erp_dimroom;
+				insert into mssilver.erp_dimroom
+				(
+					RoomKey,
+					Care_Level,
+					`Room Type`
+				)
+				select
+						RoomKey,
+						trim(Care_Level) Care_Level,
+						trim(`Room Type`) `Room Type`
+				from msbronze.erp_dimroom;
+
+			set dimroom_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 13.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_factcost table:
+
+			set factcost_start_time = now();
+
+				truncate mssilver.erp_factcost;
+				insert into mssilver.erp_factcost
+				(
+					Encounter_ID,
+					DrugCost,
+					SurgeryCost,
+					PostSurgeryCare,
+					EducationRehab,
+					PsychologicalSupport,
+					RoomCost,
+					CompanionAccommodation,
+					NutritionCost,
+					RadiologyCost,
+					EndoscopyCost,
+					AdditionalInsuranceFees,
+					TotalCost,
+					InsuranceCoverage,
+					OutOfPocketCost,
+					CBC_Cost,
+					Chem_Cost,
+					Lipid_Cost
+				)
+				select
+						Encounter_ID,
+						max(case when trim(CostType) = 'DrugCost' then trim(CostAmount) end) DrugCost,
+						cast(max(case when trim(CostType) = 'SurgeryCost' then trim(CostAmount) end) as decimal(10,2)) SurgeryCost, -- used cast() to reduce number of decimal places. 
+						cast(max(case when trim(CostType) = 'PostSurgeryCare' then trim(CostAmount) end) as decimal(10,2)) PostSurgeryCare, -- same to this column.
+						max(case when trim(CostType) = 'EducationRehab' then trim(CostAmount) end) EducationRehab,
+						max(case when trim(CostType) = 'PsychologicalSupport' then trim(CostAmount) end) PsychologicalSupport,
+						max(case when trim(CostType) = 'RoomCost' then trim(CostAmount) end) RoomCost,
+						max(case when trim(CostType) = 'CompanionAccommodation' then trim(CostAmount) end) CompanionAccommodation,
+						max(case when trim(CostType) = 'NutritionCost' then trim(CostAmount) end) NutritionCost,
+						max(case when trim(CostType) = 'RadiologyCost' then trim(CostAmount) end) RadiologyCost,
+						max(case when trim(CostType) = 'EndoscopyCost' then trim(CostAmount) end) EndoscopyCost,
+						max(case when trim(CostType) = 'AdditionalInsuranceFees' then trim(CostAmount) end) AdditionalInsuranceFees,
+						max(case when trim(CostType) = 'TotalCost' then trim(CostAmount) end) TotalCost,
+						cast(max(case when trim(CostType) = 'InsuranceCoverage' then trim(CostAmount) end) as decimal(10,2)) InsuranceCoverage, -- same to this column.
+						cast(max(case when trim(CostType) = 'OutOfPocketCost' then trim(CostAmount) end) as decimal(10,2)) OutOfPocketCost, -- same to this column.
+						max(case when trim(CostType) = 'CBC_Cost' then trim(CostAmount) end) CBC_Cost,
+						max(case when trim(CostType) = 'Chem_Cost' then trim(CostAmount) end) Chem_Cost,
+						max(case when trim(CostType) = 'Lipid_Cost' then trim(CostAmount) end) Lipid_Cost
+				from msbronze.erp_factcost
+				group by Encounter_ID;
+
+			set factcost_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 14.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_factencounter table:
+
+			set factencounter_start_time = now();
+
+				truncate mssilver.erp_factencounter;
+				insert into mssilver.erp_factencounter
+				(
+					Encounter_ID,
+					Patient_ID,
+					Disease_ID,
+					ResponsibleDoctorID,
+					InsuranceKey,
+					RoomKey,
+					der_CheckinDate,
+					der_CheckinTime,
+					der_CheckoutDate,
+					der_CheckoutTime,
+					CheckinDateKey,
+					CheckoutDateKey,
+					Patient_Severity_Score,
+					RadiologyType,
+					RadiologyProcedureCount,
+					EndoscopyType,
+					EndoscopyProcedureCount,
+					CompanionPresent
+				)
+				select
+						Encounter_ID,
+						trim(Patient_ID) Patient_ID,
+						Disease_ID,
+						ResponsibleDoctorID,
+						InsuranceKey,
+						RoomKey,
+						date(cast(trim(CheckinDate) as date)) der_CheckinDate,
+						time(cast(trim(CheckinDate) as time)) der_CheckinTime,
+						date(cast(trim(checkoutDate) as date)) der_CheckoutDate,
+						time(cast(trim(CheckoutDate) as time)) der_CheckoutTime,
+						date_format(date(cast(trim(CheckinDate) as datetime)), '%Y%m%d') CheckinDateKey,
+						date_format(date(cast(trim(checkoutDate) as datetime)), '%Y%m%d') CheckoutDateKey,
+						Patient_Severity_Score,
+						trim(RadiologyType) RadiologyType,
+						RadiologyProcedureCount,
+						trim(EndoscopyType) EndoscopyType,
+						EndoscopyProcedureCount,
+						trim(CompanionPresent) CompanionPresent
+				from msbronze.erp_factencounter;
+
+			set factencounter_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 15.
+
+			-- Final cleansed data to be inserted into the mssilver.erp_factlabtests table:
+
+			set factlabtests_start_time = now();
+
+			truncate mssilver.erp_factlabtests;
+			insert into mssilver.erp_factlabtests
+			(
+				Encounter_ID,
+				Patient_ID,
+				`Phase`,
+				`RBC (10^6/µl) (CBC)`,
+				`Hemoglobin (g/dl) (CBC)`,
+				`Hematocrit (%) (CBC)`,
+				`MCV (fL) (CBC)`,
+				`MCH (pg) (CBC)`,
+				`MCHC (g/dl) (CBC)`,
+				`RDW (%) (CBC)`,
+				`Platelets (10^3/µl) (CBC)`,
+				`WBC (10^3/µl) (CBC)`,
+				`Neutrophils_abs (10^3/µl) (CBC)`,
+				`Lymphocytes_abs (10^3/µl) (CBC)`,
+				`Monocytes_abs (10^3/µl) (CBC)`,
+				`Eosinophils_abs (10^3/µl) (CBC)`,
+				`Basophils_abs (10^3/µl) (CBC)`,
+				`Glucose (mg/dl) (Chem)`,
+				`BUN (mg/dl) (Chem)`,
+				`Creatinine (mg/dl) (Chem)`,
+				`eGFR (ml/min/1.73m^2) (Chem)`,
+				`Sodium (mEq/l) (Chem)`,
+				`Potassium (mEq/l) (Chem)`,
+				`Chloride (mEq/l) (Chem)`,
+				`Total_protein (g/dl) (Chem)`,
+				`Albumin (g/dl) (Chem)`,
+				`Uric_acid (mg/dl) (Chem)`,
+				`ALT (U/l) (Chem)`,
+				`AST (U/l) (Chem)`,
+				`ALP (U/l) (Chem)`,
+				`GGT (U/l) (Chem)`,
+				`Total_bilirubin (mg/dl) (Chem)`,
+				`TotalCholesterol (mg/dl) (Lipids)`,
+				`LDL (mg/dl) (Lipids)`,
+				`HDL (mg/dl) (Lipids)`,
+				`Triglycerides (mg/dl) (Lipids)`,
+				`ApoB (mg/dl) (Lipids)`,
+				`CRP (CRP)`
+			)
+			select
+				Encounter_ID,
+				Patient_ID,
+				`Phase`,
+				max(case when trim(TestName) = 'RBC (10^6/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'RBC (10^6/µl) (CBC)',
+				max(case when trim(TestName) = 'Hemoglobin (g/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Hemoglobin (g/dl) (CBC)',
+				max(case when trim(TestName) = 'Hematocrit (%)' and trim(`Phase`) = 'Admission' then TestValue end) 'Hematocrit (%) (CBC)',
+				max(case when trim(TestName) = 'MCV (fL)' and trim(`Phase`) = 'Admission'  then TestValue end) 'MCV (fL) (CBC)',
+				max(case when trim(TestName) = 'MCH (pg)' and trim(`Phase`) = 'Admission'  then TestValue end) 'MCH (pg) (CBC)',
+				max(case when trim(TestName) = 'MCHC (g/dl)' and trim(`Phase`) = 'Admission'  then TestValue end) 'MCHC (g/dl) (CBC)',
+				max(case when trim(TestName) = 'RDW (%)' and trim(`Phase`) = 'Admission' then TestValue end) 'RDW (%) (CBC)',
+				max(case when trim(TestName) = 'Platelets (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Platelets (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'WBC (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'WBC (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Neutrophils_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Neutrophils_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Lymphocytes_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Lymphocytes_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Monocytes_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Monocytes_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Eosinophils_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Eosinophils_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Basophils_abs (10^3/µl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Basophils_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Glucose (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Glucose (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'BUN (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'BUN (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'Creatinine (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Creatinine (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'eGFR (ml/min/1.73m^2)' and trim(`Phase`) = 'Admission' then TestValue end) 'eGFR (ml/min/1.73m^2) (Chem)',
+				max(case when trim(TestName) = 'Sodium (mEq/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'Sodium (mEq/l) (Chem)',
+				max(case when trim(TestName) = 'Potassium (mEq/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'Potassium (mEq/l) (Chem)',
+				max(case when trim(TestName) = 'Chloride (mEq/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'Chloride (mEq/l) (Chem)',
+				max(case when trim(TestName) = 'Total_protein (g/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Total_protein (g/dl) (Chem)',
+				max(case when trim(TestName) = 'Albumin (g/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Albumin (g/dl) (Chem)',
+				max(case when trim(TestName) = 'Uric_acid (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Uric_acid (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'ALT (U/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'ALT (U/l) (Chem)',
+				max(case when trim(TestName) = 'AST (U/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'AST (U/l) (Chem)',
+				max(case when trim(TestName) = 'ALP (U/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'ALP (U/l) (Chem)',
+				max(case when trim(TestName) = 'GGT (U/l)' and trim(`Phase`) = 'Admission' then TestValue end) 'GGT (U/l) (Chem)',
+				max(case when trim(TestName) = 'Total_bilirubin (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Total_bilirubin (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'TotalCholesterol (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'TotalCholesterol (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'LDL (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'LDL (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'HDL (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'HDL (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'Triglycerides (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'Triglycerides (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'ApoB (mg/dl)' and trim(`Phase`) = 'Admission' then TestValue end) 'ApoB (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'CRP' and trim(`Phase`) = 'Admission' then TestValue end) 'CRP (CRP)'
+			from msbronze.erp_factlabtests
+			group by 	Encounter_ID,
+						Patient_ID,
+						`Phase`
+			having `Phase` = 'Admission'
+
+			union all
+
+			select
+				Encounter_ID,
+				Patient_ID,
+				`Phase`,
+				max(case when trim(TestName) = 'RBC (10^6/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'RBC (10^6/µl) (CBC)',
+				max(case when trim(TestName) = 'Hemoglobin (g/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Hemoglobin (g/dl) (CBC)',
+				max(case when trim(TestName) = 'Hematocrit (%)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Hematocrit (%) (CBC)',
+				max(case when trim(TestName) = 'MCV (fL)' and trim(`Phase`) = 'Discharge'  then trim(TestValue) end) 'MCV (fL) (CBC)',
+				max(case when trim(TestName) = 'MCH (pg)' and trim(`Phase`) = 'Discharge'  then trim(TestValue) end) 'MCH (pg) (CBC)',
+				max(case when trim(TestName) = 'MCHC (g/dl)' and trim(`Phase`) = 'Discharge'  then trim(TestValue) end) 'MCHC (g/dl) (CBC)',
+				max(case when trim(TestName) = 'RDW (%)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'RDW (%) (CBC)',
+				max(case when trim(TestName) = 'Platelets (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Platelets (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'WBC (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'WBC (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Neutrophils_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Neutrophils_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Lymphocytes_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Lymphocytes_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Monocytes_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Monocytes_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Eosinophils_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Eosinophils_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Basophils_abs (10^3/µl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Basophils_abs (10^3/µl) (CBC)',
+				max(case when trim(TestName) = 'Glucose (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Glucose (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'BUN (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'BUN (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'Creatinine (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Creatinine (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'eGFR (ml/min/1.73m^2)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'eGFR (ml/min/1.73m^2) (Chem)',
+				max(case when trim(TestName) = 'Sodium (mEq/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Sodium (mEq/l) (Chem)',
+				max(case when trim(TestName) = 'Potassium (mEq/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Potassium (mEq/l) (Chem)',
+				max(case when trim(TestName) = 'Chloride (mEq/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Chloride (mEq/l) (Chem)',
+				max(case when trim(TestName) = 'Total_protein (g/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Total_protein (g/dl) (Chem)',
+				max(case when trim(TestName) = 'Albumin (g/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Albumin (g/dl) (Chem)',
+				max(case when trim(TestName) = 'Uric_acid (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Uric_acid (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'ALT (U/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'ALT (U/l) (Chem)',
+				max(case when trim(TestName) = 'AST (U/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'AST (U/l) (Chem)',
+				max(case when trim(TestName) = 'ALP (U/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'ALP (U/l) (Chem)',
+				max(case when trim(TestName) = 'GGT (U/l)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'GGT (U/l) (Chem)',
+				max(case when trim(TestName) = 'Total_bilirubin (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Total_bilirubin (mg/dl) (Chem)',
+				max(case when trim(TestName) = 'TotalCholesterol (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'TotalCholesterol (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'LDL (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'LDL (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'HDL (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'HDL (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'Triglycerides (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'Triglycerides (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'ApoB (mg/dl)' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'ApoB (mg/dl) (Lipids)',
+				max(case when trim(TestName) = 'CRP' and trim(`Phase`) = 'Discharge' then trim(TestValue) end) 'CRP (CRP)'
+			from msbronze.erp_factlabtests
+			group by 	Encounter_ID,
+						Patient_ID,
+						`Phase`
+			having `Phase` = 'Discharge';
+
+			set factlabtests_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 16.
+
+			-- Final data to be inserted into the mssilver.erp_factspecialtests table:
+
+			set factspecialtests_start_time = now();
+
+				truncate mssilver.erp_factspecialtests;
+				insert into mssilver.erp_factspecialtests
+				(
+					SpecialTest_ID,
+					Encounter_ID,
+					Test_Phase,
+					Test_Name,
+					Test_Result
+				)
+				with cte_name as
+				(
+				select
+						SpecialTest_ID,
+						Encounter_ID,
+						trim(Test_Phase) Test_Phase,
+						trim(Test_Name) Test_Name,
+						Test_Result
+				from msbronze.erp_factspecialtests
+				union all
+				select
+						Test_ID,
+						Encounter_ID,
+						trim(Test_Phase),
+						trim(Test_Name),
+						Test_Result
+				from msbronze.erp_dimspecialtest
+				)
+				select 	first_value(SpecialTest_ID) over(	partition by Encounter_ID, Test_Phase 
+															order by Test_Phase
+															rows between unbounded preceding and current row
+														) SpecialTest_ID,
+						Encounter_ID,
+						Test_Phase,
+						Test_Name,
+						Test_Result
+				from cte_name;
+
+			set factspecialtests_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 17.
+
+			-- Final data to be inserted into the mssilver.erp_facttreatment table:
+
+			set facttreatment_start_time = now();
+
+				truncate mssilver.erp_facttreatment;
+				insert into mssilver.erp_facttreatment
+				(
+					Encounter_ID,
+					Treatment_ID,
+					Treatment_Type,
+					Treatment_Name,
+					Follow_Up,
+					Complications,
+					Drug_Boxes_Used,
+					Therapy_Sessions,
+					Drug_Cost,
+					Surgery_Cost,
+					Post_Surgery_Care_Cost,
+					Education_Rehab_Cost,
+					Hospital_Drug_Quantity,
+					Discharge_Drug_Quantity,
+					Total_Drug_Quantity
+				)
+				with cte_name as
+				(
+				select
+						Encounter_ID,
+						Treatment_ID,
+						trim(Treatment_Type) Treatment_Type,
+						trim(Treatment_Name) Treatment_Name,
+						trim(Follow_Up) Follow_Up,
+						trim(Complications) Complications,
+						Drug_Boxes_Used,
+						Therapy_Sessions,
+						Drug_Cost,
+						Surgery_Cost,
+						Post_Surgery_Care_Cost,
+						Education_Rehab_Cost,
+						Hospital_Drug_Quantity,
+						Discharge_Drug_Quantity,
+						Total_Drug_Quantity        
+				from msbronze.erp_facttreatment
+
+				union all
+
+				select
+						DT.Encounter_ID,
+						DT.Treatment_ID,
+						trim( DT.Treatment_Type) Treatment_Type,
+						trim(DT.Treatment_Name) Treatment_Name,
+						trim(DT.Follow_Up) Follow_Up,
+						trim(DT.Complications) Complications,
+						DT.Drug_Boxes_Used,
+						DT.Therapy_Sessions,
+						FTC.Drug_Cost,
+						FTC.Surgery_Cost,
+						FTC.Post_Surgery_Care_Cost,
+						FTC.Education_Rehab_Cost,
+						FTC.Hospital_Drug_Quantity,
+						FTC.Discharge_Drug_Quantity,
+						FTC.Total_Drug_Quantity
+				from msbronze.erp_dimtreatment DT
+				join msbronze.erp_facttreatmentcost FTC
+					on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+				),
+
+				cte_name1 as
+				(
+				select 
+						*,
+						row_number() over	(partition by
+												Encounter_ID,
+												Treatment_ID,
+												Treatment_Type,
+												Treatment_Name,
+												Follow_Up,
+												Complications,
+												Drug_Boxes_Used,
+												Therapy_Sessions,
+												Drug_Cost,
+												Surgery_Cost,
+												Post_Surgery_Care_Cost,
+												Education_Rehab_Cost,
+												Hospital_Drug_Quantity,
+												Discharge_Drug_Quantity,
+												Total_Drug_Quantity
+											) row_num
+				from cte_name
+				)
+
+				select
+						Encounter_ID,
+						Treatment_ID,
+						Treatment_Type,
+						Treatment_Name,
+						Follow_Up,
+						Complications,
+						Drug_Boxes_Used,
+						Therapy_Sessions,
+						Drug_Cost,
+						Surgery_Cost,
+						Post_Surgery_Care_Cost,
+						Education_Rehab_Cost,
+						Hospital_Drug_Quantity,
+						Discharge_Drug_Quantity,
+						Total_Drug_Quantity
+				from cte_name1
+				where row_num = 1 and Treatment_ID not like '%none%';
+
+			set facttreatment_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 18.
+			-- Final data to be inserted into the mssilver.erp_factvitals table:
+
+			set factvitals_start_time = now();
+
+				truncate mssilver.erp_factvitals;
+				insert into mssilver.erp_factvitals
+				(
+					Encounter_ID,
+					Patient_ID,
+					`Phase`,
+					HeartRate,
+					Temperature,
+					SystolicBP,
+					DiastolicBP,
+					RespRate,
+					O2Sat
+				)
+				select 
+						Encounter_ID,
+						trim(Patient_ID) Patient_ID,
+						trim(`Phase`) `Phase`,
+						HeartRate,
+						Temperature,
+						SystolicBP,
+						DiastolicBP,
+						RespRate,
+						O2Sat
+				from msbronze.erp_factvitals;
+
+			set factvitals_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 19.
+
+			-- Final data to be inserted into the mssilver.erp_patient_allergy table:
+
+			set patient_allergy_start_time = now();
+
+				truncate mssilver.erp_patient_allergy;
+				insert into mssilver.erp_patient_allergy
+				(
+					Patient_ID,
+					AllergyID
+				)
+				with cte_name as
+				(
+				select
+						trim(Patient_ID) Patient_ID,
+						AllergyID,
+						row_number() over(partition by trim(Patient_ID), AllergyID) row_num
+				from msbronze.erp_patient_allergy
+				)
+
+				select
+						Patient_ID,
+						AllergyID
+				from cte_name
+				where row_num = 1;
+
+			set patient_allergy_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+			-- 20.
+
+			-- Final data to be inserted into the mssilver.erp_patient_chronicdisease table:
+
+			set patient_chronicdisease_start_time = now();
+
+				truncate mssilver.erp_patient_chronicdisease;
+				insert into mssilver.erp_patient_chronicdisease
+				(
+					Patient_ID,
+					ChronicDiseaseID
+				)
+				select
+						trim(Patient_ID) Patient_ID,
+						ChronicDiseaseID
+				from msbronze.erp_patient_chronicdisease;
+
+			set patient_chronicdisease_end_time = now();
+/*
+========================================================================================================================================================================
+*/
+
+			select 	'erp_bridgeencounteradditionalservice' `Table Name`,
+					bridgeencounteradditionalservice_start_time `Execution Started At`,
+					bridgeencounteradditionalservice_end_time `Execution Ended At`, 
+					concat(timestampdiff(second, bridgeencounteradditionalservice_start_time, bridgeencounteradditionalservice_end_time), ' seconds') Duration,
+                    case 	when timestampdiff(second, bridgeencounteradditionalservice_start_time, bridgeencounteradditionalservice_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, bridgeencounteradditionalservice_start_time, bridgeencounteradditionalservice_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end `Execution Speed`
+					
+			union all
+			select 	'erp_bridgeencounterdoctor',
+					bridgeencounterdoctor_start_time,
+					bridgeencounterdoctor_end_time, 
+					concat(timestampdiff(second, bridgeencounterdoctor_start_time, bridgeencounterdoctor_end_time), ' seconds'),
+                    case 	when timestampdiff(second, bridgeencounterdoctor_start_time, bridgeencounterdoctor_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, bridgeencounterdoctor_start_time, bridgeencounterdoctor_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+
+			union all
+			select 	'erp_dimadditionalservice',
+					dimadditionalservice_start_time,
+					dimadditionalservice_end_time, 
+					concat(timestampdiff(second, dimadditionalservice_start_time, dimadditionalservice_end_time), ' seconds'),
+                    case 	when timestampdiff(second, dimadditionalservice_start_time, dimadditionalservice_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, dimadditionalservice_start_time, dimadditionalservice_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+
+			union all
+			select 	'erp_dimallergy',
+					dimallergy_start_time,
+					dimallergy_end_time, 
+					concat(timestampdiff(second, dimallergy_start_time, dimallergy_end_time), ' seconds'),
+                    case 	when timestampdiff(second, dimallergy_start_time, dimallergy_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, dimallergy_start_time, dimallergy_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+
+			union all
+			select 	'erp_dimchronicdisease',
+					dimchronicdisease_start_time,
+					dimchronicdisease_end_time, 
+					concat(timestampdiff(second, dimchronicdisease_start_time, dimchronicdisease_end_time), ' seconds'),
+                    case 	when timestampdiff(second, dimchronicdisease_start_time, dimchronicdisease_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, dimchronicdisease_start_time, dimchronicdisease_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+				
+			union all
+			select 	'erp_dimdate',
+					dimdate_start_time,
+					dimdate_end_time, 
+					concat(timestampdiff(second, dimdate_start_time, dimdate_end_time), ' seconds'),
+                    case 	when timestampdiff(second, dimdate_start_time, dimdate_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, dimdate_start_time, dimdate_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all
+			select 	'erp_dimdisease',
+					dimdisease_start_time,
+					dimdisease_end_time, 
+					concat(timestampdiff(second, dimdisease_start_time, dimdisease_end_time), ' seconds'),
+                    case 	when timestampdiff(second, dimdisease_start_time, dimdisease_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, dimdisease_start_time, dimdisease_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all
+			select 	'erp_dimdoctor',
+					dimdoctor_start_time,
+					dimdoctor_end_time, 
+					concat(timestampdiff(second, dimdoctor_start_time, dimdoctor_end_time), ' seconds'),
+                    case 	when timestampdiff(second, dimdoctor_start_time, dimdoctor_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, dimdoctor_start_time, dimdoctor_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all
+			select 	'erp_diminsurancedetails',
+					diminsurancedetails_start_time,
+					diminsurancedetails_end_time, 
+					concat(timestampdiff(second, diminsurancedetails_start_time, diminsurancedetails_end_time), ' seconds'),
+                    case 	when timestampdiff(second, diminsurancedetails_start_time, diminsurancedetails_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, diminsurancedetails_start_time, diminsurancedetails_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all
+			select 	'erp_diminsurancepackages',
+					diminsurancepackages_start_time,
+					diminsurancepackages_end_time, 
+					concat(timestampdiff(second, diminsurancepackages_start_time, diminsurancepackages_end_time), ' seconds'),
+                    case 	when timestampdiff(second, diminsurancepackages_start_time, diminsurancepackages_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, diminsurancepackages_start_time, diminsurancepackages_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+
+			union all
+			select 	'erp_dimpatient',
+					dimpatient_start_time,
+					dimpatient_end_time, 
+					concat(timestampdiff(second, dimpatient_start_time, dimpatient_end_time), ' seconds'),
+                    case 	when timestampdiff(second, dimpatient_start_time, dimpatient_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, dimpatient_start_time, dimpatient_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all
+			select 	'erp_dimroom',
+					dimroom_start_time,
+					dimroom_end_time, 
+					concat(timestampdiff(second, dimroom_start_time, dimroom_end_time), ' seconds'),
+                    case 	when timestampdiff(second, dimroom_start_time, dimroom_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, dimroom_start_time, dimroom_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all
+			select 	'erp_factcost',
+					factcost_start_time,
+					factcost_end_time, 
+					concat(timestampdiff(second, factcost_start_time, factcost_end_time), ' seconds'),
+                    case 	when timestampdiff(second, factcost_start_time, factcost_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, factcost_start_time, factcost_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all
+			select 	'erp_factencounter',
+					factencounter_start_time,
+					factencounter_end_time, 
+					concat(timestampdiff(second, factencounter_start_time, factencounter_end_time), ' seconds'),
+                    case 	when timestampdiff(second, factencounter_start_time, factencounter_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, factencounter_start_time, factencounter_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+				
+			union all
+			select 	'erp_factlabtests',
+					factlabtests_start_time,
+					factlabtests_end_time, 
+					concat(timestampdiff(second, factlabtests_start_time, factlabtests_end_time), ' seconds'),
+                    case 	when timestampdiff(second, factlabtests_start_time, factlabtests_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, factlabtests_start_time, factlabtests_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all
+			select 	'erp_factspecialtests',
+					factspecialtests_start_time,
+					factspecialtests_end_time, 
+					concat(timestampdiff(second, factspecialtests_start_time, factspecialtests_end_time), ' seconds'),
+                    case 	when timestampdiff(second, factspecialtests_start_time, factspecialtests_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, factspecialtests_start_time, factspecialtests_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+					
+			union all        
+			select 	'erp_facttreatment',
+					facttreatment_start_time,
+					facttreatment_end_time, 
+					concat(timestampdiff(second, facttreatment_start_time, facttreatment_end_time), ' seconds'),
+                    case 	when timestampdiff(second, facttreatment_start_time, facttreatment_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, facttreatment_start_time, facttreatment_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+
+			union all        
+			select 	'erp_factvitals',
+					factvitals_start_time,
+					factvitals_end_time, 
+					concat(timestampdiff(second, factvitals_start_time, factvitals_end_time), ' seconds'),
+                    case 	when timestampdiff(second, factvitals_start_time, factvitals_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, factvitals_start_time, factvitals_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+
+			union all        
+			select 	'erp_patient_allergy',
+					patient_allergy_start_time,
+					patient_allergy_end_time, 
+					concat(timestampdiff(second, patient_allergy_start_time, patient_allergy_end_time), ' seconds'),
+                    case 	when timestampdiff(second, patient_allergy_start_time, patient_allergy_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, patient_allergy_start_time, patient_allergy_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end
+
+			union all        
+			select 	'erp_patient_chronicdisease',
+					patient_chronicdisease_start_time,
+					patient_chronicdisease_end_time, 
+					concat(timestampdiff(second, patient_chronicdisease_start_time, patient_chronicdisease_end_time), ' seconds'),
+                    case 	when timestampdiff(second, patient_chronicdisease_start_time, patient_chronicdisease_end_time) <= 60 then 'Fast'
+							when timestampdiff(second, patient_chronicdisease_start_time, patient_chronicdisease_end_time) <= 600 then 'Moderate'
+                            else 'Super slow'
+					end;
+
+
+		end$$
+Delimiter ;
+/*
+========================================================================================================================================================================
+*/
