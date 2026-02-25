@@ -4,6 +4,7 @@
 =======================================================================================================================================================================
 Script Purpose:
 	* The following stored procedure is responsible for loading the silver layer with cleaned and standardized data.
+	* It is performs the ETL (Extract, Transform & Load) process to populate the silver layer's tables with cleansed data from the raw data in the bronze layer.
     * For each table, the already existing data is first truncated and then the new fresh data is inserted. (Full load)
 	* The stored procedure also contains variables that are responsible to indicate how long it takes for data to be inserted into each table. 
 
