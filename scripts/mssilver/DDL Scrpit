@@ -14,6 +14,9 @@ Warning !
 =======================================================================================================================================================================
 */
 
+drop procedure mssilver.create_silver;
+call mssilver.create_silver;
+
 Delimiter $$
 	create procedure mssilver.create_silver ()
 		begin
@@ -278,10 +281,6 @@ Delimiter $$
 				Complications varchar(50),
 				Drug_Boxes_Used int,
 				Therapy_Sessions int,
-				Drug_Cost int,
-				Surgery_Cost int,
-				Post_Surgery_Care_Cost int,
-				Education_Rehab_Cost int,
 				Hospital_Drug_Quantity int,
 				Discharge_Drug_Quantity int,
 				Total_Drug_Quantity int,
