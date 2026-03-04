@@ -1835,15 +1835,15 @@ select
 		Complications,
 		Drug_Boxes_Used,
 		Therapy_Sessions,
-		Drug_Cost,
-		Surgery_Cost,
-		Post_Surgery_Care_Cost,
-		Education_Rehab_Cost,
+		-- Drug_Cost, -- This one went to the mssilver.erp_factcost table
+		-- Surgery_Cost, -- This one went to the mssilver.erp_factcost table
+		-- Post_Surgery_Care_Cost, -- This one went to the mssilver.erp_factcost table
+		-- Education_Rehab_Cost, -- This one went to the mssilver.erp_factcost table
 		Hospital_Drug_Quantity,
 		Discharge_Drug_Quantity,
-		Total_Drug_Quantity
+		(Drug_Boxes_Used + Hospital_Drug_Quantity + Discharge_Drug_Quantity) Total_Drug_Quantity
 from cte_name1
-where row_num = 1 and Treatment_ID not like '%none%';
+where row_num = 1 and Treatment_ID not like '%none%'; -- to filter out the duplicates and the invalid treatment records
 /*
 ========================================================================================================================================================================
 */
