@@ -718,99 +718,95 @@ Delimiter $$
 					Complications,
 					Drug_Boxes_Used,
 					Therapy_Sessions,
-					Drug_Cost,
-					Surgery_Cost,
-					Post_Surgery_Care_Cost,
-					Education_Rehab_Cost,
 					Hospital_Drug_Quantity,
 					Discharge_Drug_Quantity,
 					Total_Drug_Quantity
 				)
 				with cte_name as
 				(
-				select
-						Encounter_ID,
-						Treatment_ID,
-						trim(Treatment_Type) Treatment_Type,
-						trim(Treatment_Name) Treatment_Name,
-						trim(Follow_Up) Follow_Up,
-						trim(Complications) Complications,
-						Drug_Boxes_Used,
-						Therapy_Sessions,
-						Drug_Cost,
-						Surgery_Cost,
-						Post_Surgery_Care_Cost,
-						Education_Rehab_Cost,
-						Hospital_Drug_Quantity,
-						Discharge_Drug_Quantity,
-						Total_Drug_Quantity        
-				from msbronze.erp_facttreatment
+					select
+							Encounter_ID,
+							Treatment_ID,
+							trim(Treatment_Type) Treatment_Type,
+							trim(Treatment_Name) Treatment_Name,
+							trim(Follow_Up) Follow_Up,
+							trim(Complications) Complications,
+							Drug_Boxes_Used,
+							Therapy_Sessions,
+							Drug_Cost,
+							Surgery_Cost,
+							Post_Surgery_Care_Cost,
+							Education_Rehab_Cost,
+							Hospital_Drug_Quantity,
+							Discharge_Drug_Quantity,
+							Total_Drug_Quantity        
+					from msbronze.erp_facttreatment
 
-				union all
+					union all
 
-				select
-						DT.Encounter_ID,
-						DT.Treatment_ID,
-						trim( DT.Treatment_Type) Treatment_Type,
-						trim(DT.Treatment_Name) Treatment_Name,
-						trim(DT.Follow_Up) Follow_Up,
-						trim(DT.Complications) Complications,
-						DT.Drug_Boxes_Used,
-						DT.Therapy_Sessions,
-						FTC.Drug_Cost,
-						FTC.Surgery_Cost,
-						FTC.Post_Surgery_Care_Cost,
-						FTC.Education_Rehab_Cost,
-						FTC.Hospital_Drug_Quantity,
-						FTC.Discharge_Drug_Quantity,
-						FTC.Total_Drug_Quantity
-				from msbronze.erp_dimtreatment DT
-				join msbronze.erp_facttreatmentcost FTC
-					on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+					select
+							DT.Encounter_ID,
+							DT.Treatment_ID,
+							trim( DT.Treatment_Type) Treatment_Type,
+							trim(DT.Treatment_Name) Treatment_Name,
+							trim(DT.Follow_Up) Follow_Up,
+							trim(DT.Complications) Complications,
+							DT.Drug_Boxes_Used,
+							DT.Therapy_Sessions,
+							FTC.Drug_Cost,
+							FTC.Surgery_Cost,
+							FTC.Post_Surgery_Care_Cost,
+							FTC.Education_Rehab_Cost,
+							FTC.Hospital_Drug_Quantity,
+							FTC.Discharge_Drug_Quantity,
+							FTC.Total_Drug_Quantity
+					from msbronze.erp_dimtreatment DT
+					join msbronze.erp_facttreatmentcost FTC
+						on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
 				),
 
 				cte_name1 as
-				(
-				select 
-						*,
-						row_number() over	(partition by
-												Encounter_ID,
-												Treatment_ID,
-												Treatment_Type,
-												Treatment_Name,
-												Follow_Up,
-												Complications,
-												Drug_Boxes_Used,
-												Therapy_Sessions,
-												Drug_Cost,
-												Surgery_Cost,
-												Post_Surgery_Care_Cost,
-												Education_Rehab_Cost,
-												Hospital_Drug_Quantity,
-												Discharge_Drug_Quantity,
-												Total_Drug_Quantity
-											) row_num
-				from cte_name
-				)
+					(
+						select 
+								*,
+								row_number() over	(partition by
+														Encounter_ID,
+														Treatment_ID,
+														Treatment_Type,
+														Treatment_Name,
+														Follow_Up,
+														Complications,
+														Drug_Boxes_Used,
+														Therapy_Sessions,
+														Drug_Cost,
+														Surgery_Cost,
+														Post_Surgery_Care_Cost,
+														Education_Rehab_Cost,
+														Hospital_Drug_Quantity,
+														Discharge_Drug_Quantity,
+														Total_Drug_Quantity
+													) row_num
+						from cte_name
+					)
 
-				select
-						Encounter_ID,
-						Treatment_ID,
-						Treatment_Type,
-						Treatment_Name,
-						Follow_Up,
-						Complications,
-						Drug_Boxes_Used,
-						Therapy_Sessions,
-						Drug_Cost,
-						Surgery_Cost,
-						Post_Surgery_Care_Cost,
-						Education_Rehab_Cost,
-						Hospital_Drug_Quantity,
-						Discharge_Drug_Quantity,
-						Total_Drug_Quantity
-				from cte_name1
-				where row_num = 1 and Treatment_ID not like '%none%';
+					select
+							Encounter_ID,
+							Treatment_ID,
+							Treatment_Type,
+							Treatment_Name,
+							Follow_Up,
+							Complications,
+							Drug_Boxes_Used,
+							Therapy_Sessions,
+							-- Drug_Cost, -- These one went to the mssilver.erp_factcost table
+							-- Surgery_Cost, -- These one went to the mssilver.erp_factcost table
+							-- Post_Surgery_Care_Cost, -- These one went to the mssilver.erp_factcost table
+							-- Education_Rehab_Cost, -- These one went to the mssilver.erp_factcost table
+							Hospital_Drug_Quantity,
+							Discharge_Drug_Quantity,
+							(Drug_Boxes_Used + Hospital_Drug_Quantity + Discharge_Drug_Quantity) Total_Drug_Quantity
+					from cte_name1
+					where row_num = 1 and Treatment_ID not like '%none%'; -- to filter out the duplicates and the invalid treatment records
 
 			set facttreatment_end_time = now();
 /*
