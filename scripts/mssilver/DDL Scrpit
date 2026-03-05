@@ -327,7 +327,7 @@ Delimiter $$
 		select 	'Re-defining the Silver Layer' `Action`,
 				start_time `Execution Start Time`,
 				end_time `Execution End Time`,
-				concat(timestampdiff(second, start_time, end_time), ' Second') Duration;
+				concat(timestampdiff(second, start_time, end_time), ' Seconds') Duration;
 			
 		end$$
 Delimiter ;
