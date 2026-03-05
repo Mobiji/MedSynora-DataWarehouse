@@ -16,6 +16,9 @@ Warning:
 =======================================================================================================================================================================
 */
 
+drop procedure mssilver.load_silver;
+call mssilver.load_silver;
+
 Delimiter $$
 	create procedure mssilver.load_silver()
 
@@ -409,49 +412,156 @@ Delimiter $$
 
 			set factcost_start_time = now();
 
-				truncate mssilver.erp_factcost;
-				insert into mssilver.erp_factcost
+				with ctt_name as
 				(
-					Encounter_ID,
-					DrugCost,
-					SurgeryCost,
-					PostSurgeryCare,
-					EducationRehab,
-					PsychologicalSupport,
-					RoomCost,
-					CompanionAccommodation,
-					NutritionCost,
-					RadiologyCost,
-					EndoscopyCost,
-					AdditionalInsuranceFees,
-					TotalCost,
-					InsuranceCoverage,
-					OutOfPocketCost,
-					CBC_Cost,
-					Chem_Cost,
-					Lipid_Cost
+					select
+							Encounter_ID,
+							max(case when trim(CostType) = 'DrugCost' then trim(CostAmount) end) DrugCost,
+							cast(max(case when trim(CostType) = 'SurgeryCost' then trim(CostAmount) end) as decimal(10,2)) SurgeryCost, -- used cast() to reduce number of decimal places. 
+							cast(max(case when trim(CostType) = 'PostSurgeryCare' then trim(CostAmount) end) as decimal(10,2)) PostSurgeryCare, -- same to this column.
+							max(case when trim(CostType) = 'EducationRehab' then trim(CostAmount) end) EducationRehab,
+							max(case when trim(CostType) = 'PsychologicalSupport' then trim(CostAmount) end) PsychologicalSupport,
+							max(case when trim(CostType) = 'RoomCost' then trim(CostAmount) end) RoomCost,
+							max(case when trim(CostType) = 'CompanionAccommodation' then trim(CostAmount) end) CompanionAccommodation,
+							max(case when trim(CostType) = 'NutritionCost' then trim(CostAmount) end) NutritionCost,
+							max(case when trim(CostType) = 'RadiologyCost' then trim(CostAmount) end) RadiologyCost,
+							max(case when trim(CostType) = 'EndoscopyCost' then trim(CostAmount) end) EndoscopyCost,
+							max(case when trim(CostType) = 'AdditionalInsuranceFees' then trim(CostAmount) end) AdditionalInsuranceFees,
+							max(case when trim(CostType) = 'TotalCost' then trim(CostAmount) end) TotalCost,
+							cast(max(case when trim(CostType) = 'InsuranceCoverage' then trim(CostAmount) end) as decimal(10,2)) InsuranceCoverage, -- same to this column.
+							cast(max(case when trim(CostType) = 'OutOfPocketCost' then trim(CostAmount) end) as decimal(10,2)) OutOfPocketCost, -- same to this column.
+							max(case when trim(CostType) = 'CBC_Cost' then trim(CostAmount) end) CBC_Cost,
+							max(case when trim(CostType) = 'Chem_Cost' then trim(CostAmount) end) Chem_Cost,
+							max(case when trim(CostType) = 'Lipid_Cost' then trim(CostAmount) end) Lipid_Cost
+					from msbronze.erp_factcost
+					group by Encounter_ID
 				)
+
 				select
-						Encounter_ID,
-						max(case when trim(CostType) = 'DrugCost' then trim(CostAmount) end) DrugCost,
-						cast(max(case when trim(CostType) = 'SurgeryCost' then trim(CostAmount) end) as decimal(10,2)) SurgeryCost, -- used cast() to reduce number of decimal places. 
-						cast(max(case when trim(CostType) = 'PostSurgeryCare' then trim(CostAmount) end) as decimal(10,2)) PostSurgeryCare, -- same to this column.
-						max(case when trim(CostType) = 'EducationRehab' then trim(CostAmount) end) EducationRehab,
-						max(case when trim(CostType) = 'PsychologicalSupport' then trim(CostAmount) end) PsychologicalSupport,
-						max(case when trim(CostType) = 'RoomCost' then trim(CostAmount) end) RoomCost,
-						max(case when trim(CostType) = 'CompanionAccommodation' then trim(CostAmount) end) CompanionAccommodation,
-						max(case when trim(CostType) = 'NutritionCost' then trim(CostAmount) end) NutritionCost,
-						max(case when trim(CostType) = 'RadiologyCost' then trim(CostAmount) end) RadiologyCost,
-						max(case when trim(CostType) = 'EndoscopyCost' then trim(CostAmount) end) EndoscopyCost,
-						max(case when trim(CostType) = 'AdditionalInsuranceFees' then trim(CostAmount) end) AdditionalInsuranceFees,
-						max(case when trim(CostType) = 'TotalCost' then trim(CostAmount) end) TotalCost,
-						cast(max(case when trim(CostType) = 'InsuranceCoverage' then trim(CostAmount) end) as decimal(10,2)) InsuranceCoverage, -- same to this column.
-						cast(max(case when trim(CostType) = 'OutOfPocketCost' then trim(CostAmount) end) as decimal(10,2)) OutOfPocketCost, -- same to this column.
-						max(case when trim(CostType) = 'CBC_Cost' then trim(CostAmount) end) CBC_Cost,
-						max(case when trim(CostType) = 'Chem_Cost' then trim(CostAmount) end) Chem_Cost,
-						max(case when trim(CostType) = 'Lipid_Cost' then trim(CostAmount) end) Lipid_Cost
-				from msbronze.erp_factcost
-				group by Encounter_ID;
+						FC.Encounter_ID,
+						FT.Drug_Cost,
+						FT.Surgery_Cost,
+						FT.Post_Surgery_Care_Cost,
+						FT.Education_Rehab_Cost,
+						FC.PsychologicalSupport,
+						FC.RoomCost,
+						FC.CompanionAccommodation,
+						FC.NutritionCost,
+						FC.RadiologyCost,
+						FC.EndoscopyCost,
+						FC.AdditionalInsuranceFees,
+						FC.TotalCost,
+						FC.InsuranceCoverage,
+						FC.OutOfPocketCost,
+						FC.CBC_Cost,
+						FC.Chem_Cost,
+						FC.Lipid_Cost
+				from ctt_name FC
+				left join
+					(
+						with cte_name as
+						(
+							select
+									Encounter_ID,
+									Treatment_ID,
+									trim(Treatment_Type) Treatment_Type,
+									trim(Treatment_Name) Treatment_Name,
+									trim(Follow_Up) Follow_Up,
+									trim(Complications) Complications,
+									Drug_Boxes_Used,
+									Therapy_Sessions,
+									Drug_Cost,
+									Surgery_Cost,
+									Post_Surgery_Care_Cost,
+									Education_Rehab_Cost,
+									Hospital_Drug_Quantity,
+									Discharge_Drug_Quantity,
+									Total_Drug_Quantity        
+							from msbronze.erp_facttreatment
+
+							union all
+
+							select
+									DT.Encounter_ID,
+									DT.Treatment_ID,
+									trim( DT.Treatment_Type) Treatment_Type,
+									trim(DT.Treatment_Name) Treatment_Name,
+									trim(DT.Follow_Up) Follow_Up,
+									trim(DT.Complications) Complications,
+									DT.Drug_Boxes_Used,
+									DT.Therapy_Sessions,
+									FTC.Drug_Cost,
+									FTC.Surgery_Cost,
+									FTC.Post_Surgery_Care_Cost,
+									FTC.Education_Rehab_Cost,
+									FTC.Hospital_Drug_Quantity,
+									FTC.Discharge_Drug_Quantity,
+									FTC.Total_Drug_Quantity
+							from msbronze.erp_dimtreatment DT
+							join msbronze.erp_facttreatmentcost FTC
+								on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+						),
+
+						cte_name1 as
+						(
+							select 
+									*,
+									row_number() over	(partition by
+															Encounter_ID,
+															Treatment_ID,
+															Treatment_Type,
+															Treatment_Name,
+															Follow_Up,
+															Complications,
+															Drug_Boxes_Used,
+															Therapy_Sessions,
+															Drug_Cost,
+															Surgery_Cost,
+															Post_Surgery_Care_Cost,
+															Education_Rehab_Cost,
+															Hospital_Drug_Quantity,
+															Discharge_Drug_Quantity,
+															Total_Drug_Quantity
+														) row_num
+							from cte_name
+						),
+
+						cte_name2 as
+						(
+							select
+									Encounter_ID,
+									Treatment_ID,
+									Treatment_Type,
+									Treatment_Name,
+									Follow_Up,
+									Complications,
+									Drug_Boxes_Used,
+									Therapy_Sessions,
+									Drug_Cost,
+									sum(Drug_Cost) over(partition by Encounter_ID) NuDrugCost,
+									Surgery_Cost,
+									sum(Surgery_Cost) over (partition by Encounter_ID) NuSurgeryCost,
+									Post_Surgery_Care_Cost,
+									sum(Post_Surgery_Care_Cost) over(partition by Encounter_ID) NuPSCC,
+									Education_Rehab_Cost,
+									sum(Education_Rehab_Cost) over (partition by Encounter_ID)NuEduCost,
+									Hospital_Drug_Quantity,
+									Discharge_Drug_Quantity,
+									(Drug_Boxes_Used + Hospital_Drug_Quantity + Discharge_Drug_Quantity) Total_Drug_Quantity
+							from cte_name1
+							where row_num = 1 and Treatment_ID not like '%none%'
+						)
+
+						select
+								Encounter_ID,
+								round(avg(NuDrugCost), 0) Drug_Cost,
+								round(avg(NuSurgeryCost), 0) Surgery_Cost,
+								round(avg(NuPSCC),0) Post_Surgery_Care_Cost,
+								round(avg(NuEduCost), 0) Education_Rehab_Cost
+						from cte_name2
+						group by Encounter_ID
+					) FT
+					on FC.Encounter_ID = FT.Encounter_ID;
 
 			set factcost_end_time = now();
 /*
