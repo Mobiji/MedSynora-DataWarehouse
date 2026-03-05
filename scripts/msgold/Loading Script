@@ -25,7 +25,7 @@ create procedure msgold.load_gold()
 begin
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the dimension for patient information.
+-- 1. Creating a view for the dimension for patient information.
 
 create or replace view msgold.dim_patient as
 select
@@ -42,7 +42,7 @@ select
 from mssilver.erp_dimpatient;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the fact for the various allergies that each patient had.
+-- 2. Creating a view for the fact for the various allergies that each patient had.
 
 create or replace view msgold.dim_allergy as
 select
@@ -64,7 +64,7 @@ left join mssilver.erp_dimpatient DP
 	on LT.Patient_ID = DP.Patient_ID;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the fact for the various chronic diseases that a patient had.
+-- 3. Creating a view for the fact for the various chronic diseases that a patient had.
 
 create or replace view msgold.dim_chronic_disease as
 select
@@ -86,7 +86,7 @@ left join mssilver.erp_dimpatient DP
 	on LT.Patient_ID = DP.Patient_ID;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the dimension for conditions that are partially covered.
+-- 4. Creating a view for the dimension for conditions that are partially covered.
 
 create or replace view msgold.dim_insurance_packages as
 
@@ -98,7 +98,7 @@ select
 from mssilver.erp_diminsurancepackages;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the dimension for the various insurance packages that are offered.
+-- 5. Creating a view for the dimension for the various insurance packages that are offered.
 
 create or replace view msgold.dim_insurance_details as
 
@@ -110,7 +110,7 @@ select
 from mssilver.erp_diminsurancedetails;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the dimension for the various rooms that are offered.
+-- 6. Creating a view for the dimension for the various rooms that are offered.
 
 create or replace view msgold.dim_room as
 
@@ -121,7 +121,7 @@ select
 from mssilver.erp_dimroom;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the dimension for the various doctors who work in the medical centre.
+-- 7. Creating a view for the dimension for the various doctors who work in the medical centre.
 
 create or replace view msgold.dim_doctor as
 
@@ -136,7 +136,7 @@ select
 from mssilver.erp_dimdoctor;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the dimension for the various diseases that have ever been encountered at the medical centre.
+-- 8. Creating a view for the dimension for the various diseases that have ever been encountered at the medical centre.
 
 create or replace view msgold.dim_disease as
 
@@ -149,7 +149,7 @@ select
 from mssilver.erp_dimdisease;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the fact for the various labtests conducted on patients who came to the medical centre.
+-- 9. Creating a view for the fact for the various labtests conducted on patients who came to the medical centre.
 
 create or replace view msgold.fact_lab_tests as
 
@@ -194,7 +194,7 @@ select
 from mssilver.erp_factlabtests;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the fact for the various vitals that were checked on the patients who came to the medical centre.
+-- 10. Creating a view for the fact for the various vitals that were checked on the patients who came to the medical centre.
 
 create or replace view msgold.fact_vitals as
 
@@ -211,7 +211,7 @@ select
 from mssilver.erp_factvitals;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the dimension for the additional services that each patient received while admitted.
+-- 11. Creating a view for the dimension for the additional services that each patient received while admitted.
 
 create or replace view msgold.dim_encounter_additional_service as
 
@@ -223,7 +223,7 @@ left join mssilver.erp_dimadditionalservice DAS
 	on BEAS.AdditionalServiceID = DAS.AdditionalServiceID;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the fact for the encounters that each patient created for their stay at the centre.
+-- 12. Creating a view for the fact for the encounters that each patient created for their stay at the centre.
 
 create or replace view msgold.fact_encounter as
 
@@ -238,21 +238,21 @@ select
         der_CheckinTime time_of_checkin,
         der_CheckoutDate date_of_checkout,
         der_CheckoutTime time_of_checkout,
-        -- CheckinDateKey,
-        -- CheckoutDateKey,
+        -- CheckinDateKey, -- filtered this row out because the table it can connect to is not really important(mssilver.erp_dimdate) in the gold layer.
+        -- CheckoutDateKey, -- filtered this row out because the table it can connect to is not really important(mssilver.erp_dimdate) in the gold layer.
         Patient_Severity_Score patient_severity_score,
         RadiologyType radiology_type,
         RadiologyProcedureCount radiology_procedure_count,
         EndoscopyType endoscopy_type,
         EndoscopyProcedureCount endoscopy_procedure_count,
-        case 	when CompanionPresent = 'False' then 'No'
+        case 	when CompanionPresent = 'False' then 'No' -- mapping out values to friendlier values.
 				when CompanionPresent = 'True' then 'Yes'
                 else 'n/a'
 		end CompanionPresent
 from mssilver.erp_factencounter;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the fact for the various costs that each patient incurred for their encounter at the centre.
+-- 13. Creating a view for the fact for the various costs that each patient incurred for their encounter at the centre.
 
 create or replace view msgold.fact_cost as
 
@@ -276,58 +276,53 @@ select
         round(AdditionalInsuranceFees, 0) AdditionalInsuranceFees,
 		(round(DrugCost, 0) + round(SurgeryCost, 0) + round(PostSurgeryCare, 0) +	round(EducationRehab, 0) + round(PsychologicalSupport, 0) +
 			round(RoomCost, 0) + round(CompanionAccommodation, 0) +	round(NutritionCost, 0) + round(RadiologyCost, 0) +	round(EndoscopyCost, 0) +
-            round(CBC_Cost, 0) + round(Chem_Cost, 0) + round(Lipid_Cost, 0) + round(AdditionalInsuranceFees, 0)) TotalCost,
+            round(CBC_Cost, 0) + round(Chem_Cost, 0) + round(Lipid_Cost, 0) + round(AdditionalInsuranceFees, 0)) TotalCost, -- re-calculating the column 'Total_cost'.
         round(InsuranceCoverage, 0) InsuranceCoverage,
         OutOfPocketCost
 from mssilver.erp_factcost
 )
 
 select
-	Encounter_ID encounter_ID,
-	DrugCost,
-	SurgeryCost,
-	PostSurgeryCare,
-	EducationRehab,
-	PsychologicalSupport,
-	RoomCost,
-	CompanionAccommodation,
-	NutritionCost,
-	RadiologyCost,
-	EndoscopyCost,
-	CBC_Cost,
-	Chem_Cost,
-	Lipid_Cost,
-	AdditionalInsuranceFees,
-	TotalCost,
-	InsuranceCoverage,
-	(TotalCost - InsuranceCoverage) OutOfPocketCost
+	Encounter_ID encounter_id,
+	DrugCost drug_cost,
+	SurgeryCost surgery_cost,
+	PostSurgeryCare post_surgery_care_cost,
+	EducationRehab education_rehab_cost,
+	PsychologicalSupport psychological_support_cost,
+	RoomCost room_cost,
+	CompanionAccommodation companion_accommodation_cost,
+	NutritionCost nutrition_cost,
+	RadiologyCost radiology_cost,
+	EndoscopyCost endoscopy_cost,
+	CBC_Cost cbc_cost,
+	Chem_Cost chem_cost,
+	Lipid_Cost lipid_cost,
+	AdditionalInsuranceFees additional_insurance_fees,
+	TotalCost total_cost,
+	InsuranceCoverage insurance_coverage,
+	(TotalCost - InsuranceCoverage) out_of_pocket_cost -- re-calculating the column 'out_of_pocket_cost' given that the column 'total_cost' was previously re-calculated.
 from cte_name;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the fact for the treatment that each patient received at the centre.
+-- 14. Creating a view for the fact for the treatment that each patient received at the centre.
 
 create or replace view msgold.fact_treatment as
 
 select
 		Encounter_ID encounter_id,
-        -- Treatment_ID, -- Omitted this because it is not a key that can be used to connect this table to another in the start schema.
         Treatment_Type treatment_type,
         Treatment_Name treatment_name,
         Follow_Up follow_up,
         Complications complications,
         Therapy_Sessions therapy_sessions,
         Drug_Boxes_Used drug_boxes_used,
-        -- Drug_Cost,
-        -- Surgery_Cost,
-        -- Post_Surgery_Care_Cost,
-        -- Education_Rehab_Cost,
         Hospital_Drug_Quantity hospital_drug_quantity,
         Discharge_Drug_Quantity discharge_drug_quantity,
         (Drug_Boxes_Used + Hospital_Drug_Quantity + Discharge_Drug_Quantity) total_drug_quantity
 from mssilver.erp_facttreatment;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- Creating a view for the fact for the special tests that each patient was done for at the centre.
+-- 15. Creating a view for the fact for the special tests that each patient was done for at the centre.
 
 create or replace view msgold.fact_special_tests as
 
