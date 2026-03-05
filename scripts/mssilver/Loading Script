@@ -411,7 +411,29 @@ Delimiter $$
 			-- Final cleansed data to be inserted into the mssilver.erp_factcost table:
 
 			set factcost_start_time = now();
-
+			
+				truncate mssilver.erp_factcost;
+				insert into mssilver.erp_factcost
+				(
+					Encounter_ID,
+					DrugCost,
+					SurgeryCost,
+					PostSurgeryCare,
+					EducationRehab,
+					PsychologicalSupport,
+					RoomCost,
+					CompanionAccommodation,
+					NutritionCost,
+					RadiologyCost,
+					EndoscopyCost,
+					AdditionalInsuranceFees,
+					TotalCost,
+					InsuranceCoverage,
+					OutOfPocketCost,
+					CBC_Cost,
+					Chem_Cost,
+					Lipid_Cost
+				)
 				with ctt_name as
 				(
 					select
