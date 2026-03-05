@@ -531,118 +531,6 @@ from msbronze.erp_dimroom;
 /* 
 =======================================================================================================================================================================
 */
-select *
-from msbronze.erp_factcost;
--- This table contains the different types of costs and amounts that each patient was charged during their visit to the Medsynora medical centre.
-
--- Test: Checking for duplicates
-with cte_name as
-(
-select 	Encounter_ID,
-		trim(CostType) CostType,
-        trim(CostAmount) CostAmount,
-        row_number() over	(partition by
-								Encounter_ID,
-								trim(CostType),
-								trim(CostAmount)
-							) row_num
-from msbronze.erp_factcost
-)
-
-select *
-from cte_name
-where row_num > 1;
--- Result: No duplicates found.
--- _____________________________________________________________________________________________________________________________________________________________________
-
--- Test: Checking for nulls.
-select *
-from msbronze.erp_factcost
-where 	Encounter_ID is null
-		or trim(CostType) is null
-		or trim(CostAmount) is null;
--- Result: Zero nulls found.
--- _____________________________________________________________________________________________________________________________________________________________________
-
-/* 
-		* Upon taking a closer look at the table, I discovered that EACH distinct Encounter_ID has EXACTLY 17 events/records.
-        * This suggests that the table is in the long format hence the huge number of rows (2,513,484).
-        * I will convert this table to the wide format where there will be a total of 18 columns and 147,852 total rows.
-	Reason: In order to facilitate future joins during report creating.
-*/
-
-select
-		Encounter_ID,
-		max(case when trim(CostType) = 'DrugCost' then CostAmount end) DrugCost,
-		max(case when trim(CostType) = 'SurgeryCost' then CostAmount end) SurgeryCost,
-		max(case when trim(CostType) = 'PostSurgeryCare' then CostAmount end) PostSurgeryCare,
-		max(case when trim(CostType) = 'EducationRehab' then CostAmount end) EducationRehab,
-		max(case when trim(CostType) = 'PsychologicalSupport' then CostAmount end) PsychologicalSupport,
-		max(case when trim(CostType) = 'RoomCost' then CostAmount end) RoomCost,
-		max(case when trim(CostType) = 'CompanionAccommodation' then CostAmount end) CompanionAccommodation,
-		max(case when trim(CostType) = 'NutritionCost' then CostAmount end) NutritionCost,
-		max(case when trim(CostType) = 'RadiologyCost' then CostAmount end) RadiologyCost,
-		max(case when trim(CostType) = 'EndoscopyCost' then CostAmount end) EndoscopyCost,
-		max(case when trim(CostType) = 'AdditionalInsuranceFees' then CostAmount end) AdditionalInsuranceFees,
-		max(case when trim(CostType) = 'TotalCost' then CostAmount end) TotalCost,
-		max(case when trim(CostType) = 'InsuranceCoverage' then CostAmount end) InsuranceCoverage,
-		max(case when trim(CostType) = 'OutOfPocketCost' then CostAmount end) OutOfPocketCost,
-		max(case when trim(CostType) = 'CBC_Cost' then CostAmount end) CBC_Cost,
-		max(case when trim(CostType) = 'Chem_Cost' then CostAmount end) Chem_Cost,
-		max(case when trim(CostType) = 'Lipid_Cost' then CostAmount end) Lipid_Cost,
-        row_number() over() rrank
-from msbronze.erp_factcost
-group by Encounter_ID;
-
-/*
-	* The above query failed to execute giving 'Error code: 2013. Lost connection to MySQL server during query'.
-	* On further investigation, I figured out that the size of the table is what is the problem.
-	* On attempting to execute the above query on smaller chunks of the table, the query executes successfully.
-	* After testing, I found a sweet spot regarding the size of the chunks (370,000 rows).
-	* Beyond that MySQL looses connection to the server.
-	* So I'll transpose the data in chunks of 370,000 rows.
-	* On trying this, EACH query takes around 28 seconds to execute meaning that it will take a total of (2,513,484 / 370,000) seconds to transpose
-		the whole table which seems really inefficient.
-	* I had to look for an alternative method which requires less code writing and also less execution time.
-*/ 
-
-/*
-	* After some back and forth, I consulted AI who enlightened me that the problem was not the size of my dataset but rather, my specific query's execution time 
-		exceeded the default wait_timeout system variable limit which is 30 seconds. To fix this, I extended both the 'net_read_timeout' variable on the server side
-        and the 'DBMS connection read timeout (in seconds)' on client's side to 600 seconds'.
-				Server side: 	1. [SHOW VARIABLES LIKE '%timeout%';] -- scroll down to 'net_read_timeout' and observe what amount is indicated in the 'value' column.
-								2. [SET GLOBAL net_read_timeout = 600;] -- Run this query to increase the value observed in the step above.
-				Client's side: 1. 	'Edit' → 'Preferences' → 'SQL Editor' → 'DBMS connection read timeout interval (in seconds)' 
-									Increase it to more than the indicated amount.
-	* After doing the above, I re executed the query above but now without the 370,000 row limit.
-    * The query executed successfully taking a total of 68 seconds to execute.
-*/
-
--- So the final cleansed data to be inserted into the mssilver.erp_factcost table will come from:
-select
-		Encounter_ID,
-		max(case when trim(CostType) = 'DrugCost' then trim(CostAmount) end) DrugCost,
-		cast(max(case when trim(CostType) = 'SurgeryCost' then trim(CostAmount) end) as decimal(10,2)) SurgeryCost, -- used cast() to reduce number of decimal places. 
-		cast(max(case when trim(CostType) = 'PostSurgeryCare' then trim(CostAmount) end) as decimal(10,2)) PostSurgeryCare, -- same to this column.
-		max(case when trim(CostType) = 'EducationRehab' then trim(CostAmount) end) EducationRehab,
-		max(case when trim(CostType) = 'PsychologicalSupport' then trim(CostAmount) end) PsychologicalSupport,
-		max(case when trim(CostType) = 'RoomCost' then trim(CostAmount) end) RoomCost,
-		max(case when trim(CostType) = 'CompanionAccommodation' then trim(CostAmount) end) CompanionAccommodation,
-		max(case when trim(CostType) = 'NutritionCost' then trim(CostAmount) end) NutritionCost,
-		max(case when trim(CostType) = 'RadiologyCost' then trim(CostAmount) end) RadiologyCost,
-		max(case when trim(CostType) = 'EndoscopyCost' then trim(CostAmount) end) EndoscopyCost,
-		max(case when trim(CostType) = 'AdditionalInsuranceFees' then trim(CostAmount) end) AdditionalInsuranceFees,
-		max(case when trim(CostType) = 'TotalCost' then trim(CostAmount) end) TotalCost,
-		cast(max(case when trim(CostType) = 'InsuranceCoverage' then trim(CostAmount) end) as decimal(10,2)) InsuranceCoverage, -- same to this column.
-		cast(max(case when trim(CostType) = 'OutOfPocketCost' then trim(CostAmount) end) as decimal(10,2)) OutOfPocketCost, -- same to this column.
-		max(case when trim(CostType) = 'CBC_Cost' then trim(CostAmount) end) CBC_Cost,
-		max(case when trim(CostType) = 'Chem_Cost' then trim(CostAmount) end) Chem_Cost,
-		max(case when trim(CostType) = 'Lipid_Cost' then trim(CostAmount) end) Lipid_Cost
-from msbronze.erp_factcost
-group by Encounter_ID;
-/* 
-=======================================================================================================================================================================
-*/
 
 select *
 from msbronze.erp_factencounter;
@@ -1846,6 +1734,305 @@ from cte_name1
 where row_num = 1 and Treatment_ID not like '%none%'; -- to filter out the duplicates and the invalid treatment records
 /*
 ========================================================================================================================================================================
+*/
+
+select *
+from msbronze.erp_factcost;
+-- This table contains the different types of costs and amounts that each patient was charged during their visit to the Medsynora medical centre.
+
+-- Test: Checking for duplicates
+with cte_name as
+(
+select 	Encounter_ID,
+		trim(CostType) CostType,
+        trim(CostAmount) CostAmount,
+        row_number() over	(partition by
+								Encounter_ID,
+								trim(CostType),
+								trim(CostAmount)
+							) row_num
+from msbronze.erp_factcost
+)
+
+select *
+from cte_name
+where row_num > 1;
+-- Result: No duplicates found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+-- Test: Checking for nulls.
+select *
+from msbronze.erp_factcost
+where 	Encounter_ID is null
+		or trim(CostType) is null
+		or trim(CostAmount) is null;
+-- Result: Zero nulls found.
+-- _____________________________________________________________________________________________________________________________________________________________________
+
+/* 
+		* Upon taking a closer look at the table, I discovered that EACH distinct Encounter_ID has EXACTLY 17 events/records.
+        * This suggests that the table is in the long format hence the huge number of rows (2,513,484).
+        * I will convert this table to the wide format where there will be a total of 18 columns and 147,852 total rows.
+	Reason: In order to facilitate future joins during report creating.
+*/
+
+select
+		Encounter_ID,
+		max(case when trim(CostType) = 'DrugCost' then CostAmount end) DrugCost,
+		max(case when trim(CostType) = 'SurgeryCost' then CostAmount end) SurgeryCost,
+		max(case when trim(CostType) = 'PostSurgeryCare' then CostAmount end) PostSurgeryCare,
+		max(case when trim(CostType) = 'EducationRehab' then CostAmount end) EducationRehab,
+		max(case when trim(CostType) = 'PsychologicalSupport' then CostAmount end) PsychologicalSupport,
+		max(case when trim(CostType) = 'RoomCost' then CostAmount end) RoomCost,
+		max(case when trim(CostType) = 'CompanionAccommodation' then CostAmount end) CompanionAccommodation,
+		max(case when trim(CostType) = 'NutritionCost' then CostAmount end) NutritionCost,
+		max(case when trim(CostType) = 'RadiologyCost' then CostAmount end) RadiologyCost,
+		max(case when trim(CostType) = 'EndoscopyCost' then CostAmount end) EndoscopyCost,
+		max(case when trim(CostType) = 'AdditionalInsuranceFees' then CostAmount end) AdditionalInsuranceFees,
+		max(case when trim(CostType) = 'TotalCost' then CostAmount end) TotalCost,
+		max(case when trim(CostType) = 'InsuranceCoverage' then CostAmount end) InsuranceCoverage,
+		max(case when trim(CostType) = 'OutOfPocketCost' then CostAmount end) OutOfPocketCost,
+		max(case when trim(CostType) = 'CBC_Cost' then CostAmount end) CBC_Cost,
+		max(case when trim(CostType) = 'Chem_Cost' then CostAmount end) Chem_Cost,
+		max(case when trim(CostType) = 'Lipid_Cost' then CostAmount end) Lipid_Cost,
+        row_number() over() rrank
+from msbronze.erp_factcost
+group by Encounter_ID;
+
+/*
+	* The above query failed to execute giving 'Error code: 2013. Lost connection to MySQL server during query'.
+	* On further investigation, I figured out that the size of the table is what is the problem.
+	* On attempting to execute the above query on smaller chunks of the table, the query executes successfully.
+	* After testing, I found a sweet spot regarding the size of the chunks (370,000 rows).
+	* Beyond that MySQL looses connection to the server.
+	* So I'll transpose the data in chunks of 370,000 rows.
+	* On trying this, EACH query takes around 28 seconds to execute meaning that it will take a total of (2,513,484 / 370,000) seconds to transpose
+		the whole table which seems really inefficient.
+	* I had to look for an alternative method which requires less code writing and also less execution time.
+*/ 
+
+/*
+	* After some back and forth, I consulted AI who enlightened me that the problem was not the size of my dataset but rather, my specific query's execution time 
+		exceeded the default wait_timeout system variable limit which is 30 seconds. To fix this, I extended both the 'net_read_timeout' variable on the server side
+        and the 'DBMS connection read timeout (in seconds)' on client's side to 600 seconds'.
+				Server side: 	1. [SHOW VARIABLES LIKE '%timeout%';] -- scroll down to 'net_read_timeout' and observe what amount is indicated in the 'value' column.
+								2. [SET GLOBAL net_read_timeout = 600;] -- Run this query to increase the value observed in the step above.
+				Client's side: 1. 	'Edit' → 'Preferences' → 'SQL Editor' → 'DBMS connection read timeout interval (in seconds)' 
+									Increase it to more than the indicated amount.
+	* After doing the above, I re-executed the query above but now without the 370,000 row limit.
+    * The query executed successfully taking a total of 68 seconds to execute.
+*/
+
+-- So the cleansed data to be inserted into the mssilver.erp_factcost table will come from:
+select
+		Encounter_ID,
+		max(case when trim(CostType) = 'DrugCost' then trim(CostAmount) end) DrugCost,
+		cast(max(case when trim(CostType) = 'SurgeryCost' then trim(CostAmount) end) as decimal(10,2)) SurgeryCost, -- used cast() to reduce number of decimal places. 
+		cast(max(case when trim(CostType) = 'PostSurgeryCare' then trim(CostAmount) end) as decimal(10,2)) PostSurgeryCare, -- same to this column.
+		max(case when trim(CostType) = 'EducationRehab' then trim(CostAmount) end) EducationRehab,
+		max(case when trim(CostType) = 'PsychologicalSupport' then trim(CostAmount) end) PsychologicalSupport,
+		max(case when trim(CostType) = 'RoomCost' then trim(CostAmount) end) RoomCost,
+		max(case when trim(CostType) = 'CompanionAccommodation' then trim(CostAmount) end) CompanionAccommodation,
+		max(case when trim(CostType) = 'NutritionCost' then trim(CostAmount) end) NutritionCost,
+		max(case when trim(CostType) = 'RadiologyCost' then trim(CostAmount) end) RadiologyCost,
+		max(case when trim(CostType) = 'EndoscopyCost' then trim(CostAmount) end) EndoscopyCost,
+		max(case when trim(CostType) = 'AdditionalInsuranceFees' then trim(CostAmount) end) AdditionalInsuranceFees,
+		max(case when trim(CostType) = 'TotalCost' then trim(CostAmount) end) TotalCost,
+		cast(max(case when trim(CostType) = 'InsuranceCoverage' then trim(CostAmount) end) as decimal(10,2)) InsuranceCoverage, -- same to this column.
+		cast(max(case when trim(CostType) = 'OutOfPocketCost' then trim(CostAmount) end) as decimal(10,2)) OutOfPocketCost, -- same to this column.
+		max(case when trim(CostType) = 'CBC_Cost' then trim(CostAmount) end) CBC_Cost,
+		max(case when trim(CostType) = 'Chem_Cost' then trim(CostAmount) end) Chem_Cost,
+		max(case when trim(CostType) = 'Lipid_Cost' then trim(CostAmount) end) Lipid_Cost
+from msbronze.erp_factcost
+group by Encounter_ID;
+
+/*
+	* From the final result to be inserted into the mssilver.facttreatment table, I omitted a few columns that had cost info because the table is primarily
+		a treatment table. The columns in context are Drug_Cost, Surgery_Cost, Post_Surgery_Care_Cost, Education_Rehab_Cost.
+	* I omitted them and decided to insert them into the table mssilver.erp_factcost result set.
+    * But before incorporating the columns, some aggragation is needed. The facttreatment table has individual breakdown of the cost informations accross the different
+		treatments that each patient received but in the factcost table, there are aggregate(sum of treatment costs) values for the various costs that each patient
+        paid for. See below for better understanding.
+        
+mssilver.erp_facttreatment table sample data:
+    
+Encounter_ID  TreatID	TreaType	TreatName	Fol_Up	Complic  DBs_Used  Ther_Sess  DrgCost SurgCost	PstSurgCareCost	EduRehCost	HosDrgQuant	DisDrgQuant	TtlDrgQuant
+2156		  3325		Drug		Aspirin		 Yes	  No	 	1		   0	     5	     0	           0	         0	         3	        24			27
+2156		  3333		Drug		Penicillin	 Yes	  No	   12	       0	    180	     0	           0	         0	         5	         7	        12
+2156		  3336	    Drug	    Cilostazol	 No	      Yes	    1	       0	     60	     0	           0	         0	         5	        18	        23
+2156		  3337	    Drug	    Statins	     Yes	  No	    1	       0	     50	     0	           0	         0	         5	        22	        27
+2156		  3338	   Therapy	    Exer.Ther	 No	      No	    0	      69	      0	     0	           0	      5520	         0	         0	         0
+2156	      3434	    Drug	    Ibuprofen	 No	     Yes	    1	       0	     10 	 0	           0	         0	         3	         7	        10
+2156		  3707	   Surgery	  Tonsillectomy	Yes	      No	    0	       0	      0	   18262	     715	         0	         0	         0	         0
+
+2157		  3341	    Drug	     Heparin	Yes	     Yes	   13	       0	   1560	     0	           0	         0	         7	         6	        13
+2157		  3342	    Drug	    Warfarin	Yes	     Yes	    1	       0	     25	     0	           0	         0	         6	        21	        27
+2157		  3503	   Surgery	  Pulm.Embolect Yes	      No	    0	       0	      0	  148895	     890	         0	         0	         0	         0
+2157		  3659	   Surgery	    Filling	    Yes	      No	    0	       0	      0	    355	         600	         0	         0	         0	         0
+2157		  3660	   Therapy	  Fluor.Treat	Yes	      No	    0	       0	      0	     0	           0	         0	         0	         0	         0    
+    
+    mssilver.erp_factcost table sample data:
+    
+EncID  DrgCst   SurgCst	 PSurgCare	EduReh	PsychSupp	RmCst	CompAcc	 NutCost   RadCost	EndCost	 AddInsuFees  TtlCst   InsCove	 OOPckCst  CBCost   ChemCst  LpdCst
+2156   190.00	18261.67   715.00	 0.00	  0.00	   10800.00	1800.00	 3290.00	0.00	0.00	  16200.00	 53927.00  25908.67	 11818.00  1200.00  1350.00	 120.00
+2157	0.00	354.63	   600.00	 0.00	  0.00	   26640.00	1800.00	 3120.00	0.00	0.00	  15840.00	 50785.00  45647.90	 5136.73   1050.00	1260.00	 120.00
+        
+*/
+
+-- Final cleanse data to be inserted into the mssilver.erp_factcost table:
+
+with ctt_name as
+(
+	select
+			Encounter_ID,
+			max(case when trim(CostType) = 'DrugCost' then trim(CostAmount) end) DrugCost,
+			cast(max(case when trim(CostType) = 'SurgeryCost' then trim(CostAmount) end) as decimal(10,2)) SurgeryCost, -- used cast() to reduce number of decimal places. 
+			cast(max(case when trim(CostType) = 'PostSurgeryCare' then trim(CostAmount) end) as decimal(10,2)) PostSurgeryCare, -- same to this column.
+			max(case when trim(CostType) = 'EducationRehab' then trim(CostAmount) end) EducationRehab,
+			max(case when trim(CostType) = 'PsychologicalSupport' then trim(CostAmount) end) PsychologicalSupport,
+			max(case when trim(CostType) = 'RoomCost' then trim(CostAmount) end) RoomCost,
+			max(case when trim(CostType) = 'CompanionAccommodation' then trim(CostAmount) end) CompanionAccommodation,
+			max(case when trim(CostType) = 'NutritionCost' then trim(CostAmount) end) NutritionCost,
+			max(case when trim(CostType) = 'RadiologyCost' then trim(CostAmount) end) RadiologyCost,
+			max(case when trim(CostType) = 'EndoscopyCost' then trim(CostAmount) end) EndoscopyCost,
+			max(case when trim(CostType) = 'AdditionalInsuranceFees' then trim(CostAmount) end) AdditionalInsuranceFees,
+			max(case when trim(CostType) = 'TotalCost' then trim(CostAmount) end) TotalCost,
+			cast(max(case when trim(CostType) = 'InsuranceCoverage' then trim(CostAmount) end) as decimal(10,2)) InsuranceCoverage, -- same to this column.
+			cast(max(case when trim(CostType) = 'OutOfPocketCost' then trim(CostAmount) end) as decimal(10,2)) OutOfPocketCost, -- same to this column.
+			max(case when trim(CostType) = 'CBC_Cost' then trim(CostAmount) end) CBC_Cost,
+			max(case when trim(CostType) = 'Chem_Cost' then trim(CostAmount) end) Chem_Cost,
+			max(case when trim(CostType) = 'Lipid_Cost' then trim(CostAmount) end) Lipid_Cost
+	from msbronze.erp_factcost
+	group by Encounter_ID
+)
+
+select
+		FC.Encounter_ID,
+		FT.Drug_Cost,
+        FT.Surgery_Cost,
+        FT.Post_Surgery_Care_Cost,
+        FT.Education_Rehab_Cost,
+        FC.PsychologicalSupport,
+        FC.RoomCost,
+        FC.CompanionAccommodation,
+        FC.NutritionCost,
+        FC.RadiologyCost,
+        FC.EndoscopyCost,
+        FC.AdditionalInsuranceFees,
+        FC.TotalCost,
+        FC.InsuranceCoverage,
+        FC.OutOfPocketCost,
+        FC.CBC_Cost,
+        FC.Chem_Cost,
+        FC.Lipid_Cost
+from ctt_name FC
+left join
+	(
+		with cte_name as
+		(
+			select
+					Encounter_ID,
+					Treatment_ID,
+					trim(Treatment_Type) Treatment_Type,
+					trim(Treatment_Name) Treatment_Name,
+					trim(Follow_Up) Follow_Up,
+					trim(Complications) Complications,
+					Drug_Boxes_Used,
+					Therapy_Sessions,
+					Drug_Cost,
+					Surgery_Cost,
+					Post_Surgery_Care_Cost,
+					Education_Rehab_Cost,
+					Hospital_Drug_Quantity,
+					Discharge_Drug_Quantity,
+					Total_Drug_Quantity        
+			from msbronze.erp_facttreatment
+
+			union all
+
+			select
+					DT.Encounter_ID,
+					DT.Treatment_ID,
+					trim( DT.Treatment_Type) Treatment_Type,
+					trim(DT.Treatment_Name) Treatment_Name,
+					trim(DT.Follow_Up) Follow_Up,
+					trim(DT.Complications) Complications,
+					DT.Drug_Boxes_Used,
+					DT.Therapy_Sessions,
+					FTC.Drug_Cost,
+					FTC.Surgery_Cost,
+					FTC.Post_Surgery_Care_Cost,
+					FTC.Education_Rehab_Cost,
+					FTC.Hospital_Drug_Quantity,
+					FTC.Discharge_Drug_Quantity,
+					FTC.Total_Drug_Quantity
+			from msbronze.erp_dimtreatment DT
+			join msbronze.erp_facttreatmentcost FTC
+				on DT.Encounter_ID = FTC.Encounter_ID and DT.Treatment_ID = FTC.Treatment_ID
+		),
+
+		cte_name1 as
+		(
+			select 
+					*,
+					row_number() over	(partition by
+											Encounter_ID,
+											Treatment_ID,
+											Treatment_Type,
+											Treatment_Name,
+											Follow_Up,
+											Complications,
+											Drug_Boxes_Used,
+											Therapy_Sessions,
+											Drug_Cost,
+											Surgery_Cost,
+											Post_Surgery_Care_Cost,
+											Education_Rehab_Cost,
+											Hospital_Drug_Quantity,
+											Discharge_Drug_Quantity,
+											Total_Drug_Quantity
+										) row_num
+			from cte_name
+		),
+
+		cte_name2 as
+		(
+			select
+					Encounter_ID,
+					Treatment_ID,
+					Treatment_Type,
+					Treatment_Name,
+					Follow_Up,
+					Complications,
+					Drug_Boxes_Used,
+					Therapy_Sessions,
+					Drug_Cost,
+					sum(Drug_Cost) over(partition by Encounter_ID) NuDrugCost,
+					Surgery_Cost,
+					sum(Surgery_Cost) over (partition by Encounter_ID) NuSurgeryCost,
+					Post_Surgery_Care_Cost,
+					sum(Post_Surgery_Care_Cost) over(partition by Encounter_ID) NuPSCC,
+					Education_Rehab_Cost,
+					sum(Education_Rehab_Cost) over (partition by Encounter_ID)NuEduCost,
+					Hospital_Drug_Quantity,
+					Discharge_Drug_Quantity,
+					(Drug_Boxes_Used + Hospital_Drug_Quantity + Discharge_Drug_Quantity) Total_Drug_Quantity
+			from cte_name1
+			where row_num = 1 and Treatment_ID not like '%none%'
+		)
+
+		select
+				Encounter_ID,
+				round(avg(NuDrugCost), 0) Drug_Cost,
+				round(avg(NuSurgeryCost), 0) Surgery_Cost,
+				round(avg(NuPSCC),0) Post_Surgery_Care_Cost,
+				round(avg(NuEduCost), 0) Education_Rehab_Cost
+		from cte_name2
+		group by Encounter_ID
+	) FT
+	on FC.Encounter_ID = FT.Encounter_ID;
+/* 
+=======================================================================================================================================================================
 */
 
 select *
