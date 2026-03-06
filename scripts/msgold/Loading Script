@@ -9,15 +9,34 @@ Script Purpose:
 	* For each view, I have used the 'create or replace view' statement in order to replace the view's content everytime the stored procedure is invoked.
 	* The stored procedure does not contain any variables nor parameters. 
 
-How to utilize the stored procedure:
+How to utilize the query block:
 	* Execute the following query [call msgold.load_gold;]
-    * To re-define the stored procedure, first execute the query [drop procedure if exists msgold.load_gold;] then execute the query provided above.
+    * To re-define the Gold layer, first execute the query [drop view if exists......] then execute the query [drop procedure if exists msgold.load_gold;].
+    * Then execute the 'create procedure' query below.
+    * Finally call the procedure by executing the query [call msgold.load_gold;].
     
 Warnings: Nil.
 */
 
--- drop procedure if exists msgold.load_gold;
--- call msgold.load_gold;
+drop view if exists msgold.dim_patient,
+					msgold.dim_allergy,
+                    msgold.dim_chronic_disease,
+                    msgold.dim_insurance_packages,
+                    msgold.dim_insurance_details,
+                    msgold.dim_room,
+                    msgold.dim_doctor,
+                    msgold.dim_disease,
+                    msgold.fact_lab_tests,
+                    msgold.fact_vitals,
+                    msgold.dim_encounter_additional_service,
+                    msgold.fact_encounter,
+                    msgold.fact_cost,
+                    msgold.fact_treatment,
+                    msgold.fact_special_tests;
+
+
+drop procedure if exists msgold.load_gold;
+call msgold.load_gold;
 
 delimiter $$
 create procedure msgold.load_gold()
