@@ -124,7 +124,7 @@ create or replace view msgold.dim_insurance_details as
 select
 		InsuranceKey insurance_id,
         `Insurance Plan Name` Insurance_type,
-        `Coverage Limit` extent_of_coverage,
+        concat(round((`Coverage Limit` * 100), 0), '%') extent_of_coverage, -- to convert it from a decimal to a percentage.
         Deductible deductible
 from mssilver.erp_diminsurancedetails;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -173,9 +173,9 @@ from mssilver.erp_dimdisease;
 create or replace view msgold.fact_lab_tests as
 
 select
-		Encounter_ID,
-        Patient_ID,
-        Phase,
+		Encounter_ID encounter_id,
+        Patient_ID patient_id,
+        Phase phase,
         `RBC (10^6/µl) (CBC)` `rbc_(10^6/µl)_(cbc)`,
 		`Hemoglobin (g/dl) (CBC)` `hemoglobin_(g/dl))(cbc)`,
 		`Hematocrit (%) (CBC)` `hematocrit_(%)_(cbc)`,
@@ -201,7 +201,7 @@ select
 		`Uric_acid (mg/dl) (Chem)` `uric_acid_(mg/dl)_(chem)`,
 		`ALT (U/l) (Chem)` `alt_(u/l)_(chem)`,
 		`AST (U/l) (Chem)` `ast (u/l)_(chem)`,
-		`ALP (U/l) (Chem)` `ALP_(u/l)_(chem)`,
+		`ALP (U/l) (Chem)` `alp_(u/l)_(chem)`,
 		`GGT (U/l) (Chem)` `ggt_(u/l)_(chem)`,
 		`Total_bilirubin (mg/dl) (Chem)` `total_bilirubin_(mg/dl)_(chem)`,
 		`TotalCholesterol (mg/dl) (Lipids)` `totalcholesterol_(mg/dl)_(lipids)`,
