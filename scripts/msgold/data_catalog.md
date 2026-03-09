@@ -83,7 +83,7 @@
 |---------------------------|---------------------|--------------------------------------------------------------------------------------------------------------------|
 |     insurance_id          |     integer         |     An id that uniquely represents an insurance package.                                                           |
 |     Insurance_type        |     varchar(30)     |     Name of the insurance package.                                                                                 |
-|     extent_of_coverage    |     Decimal(4,2)    |     A decimal representing how many illnesses the insurance package partially covers as a percentage.              |
+|     extent_of_coverage    |     Decimal(4,2)    |     A decimal representing how mmany illnesses the insurance package partially covers.                             |
 |     deductible            |     integer         |     An integer value that is deducted from patients that have subscribed to the package.                           |
 
 
@@ -187,8 +187,11 @@
 **12. fact_lab_tests**
 
  * **Content:** Stores information on the lab tests that were conducted on patients.
+   
    (cbc) – means ‘total blood count’ test
+   
    (chem) – means chemical test
+   
    (lipids) – means lipids test 
 
 |     Column Name                          |     Data Type          |     Description                                                                                                                                                                                                        |
