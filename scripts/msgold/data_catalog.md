@@ -83,7 +83,7 @@
 |---------------------------|---------------------|--------------------------------------------------------------------------------------------------------------------|
 |     insurance_id          |     integer         |     An id that uniquely represents an insurance package.                                                           |
 |     Insurance_type        |     varchar(30)     |     Name of the insurance package.                                                                                 |
-|     extent_of_coverage    |     Decimal(4,2)    |     A decimal representing how many illnesses the insurance package partially covers.                              |
+|     extent_of_coverage    |     Decimal(4,2)    |     A decimal representing how many illnesses the insurance package partially covers as a percentage.              |
 |     deductible            |     integer         |     An integer value that is deducted from patients that have subscribed to the package.                           |
 
 
