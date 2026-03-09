@@ -188,7 +188,7 @@
 
  * **Content:** Stores information on the lab tests that were conducted on patients.
    
-   (cbc) – means ‘total blood count’ test
+   (cbc) – means ‘complete blood count’ test
    
    (chem) – means chemical test
    
