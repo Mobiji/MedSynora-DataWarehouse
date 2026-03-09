@@ -7,7 +7,7 @@
 
 **1. dim_allergy**
 
- ***Content:** Stores the various allergy names that patients have. 
+ * **Content:** Stores the various allergy names that patients have. 
 |     Column Name    |     Data Type      |     Description                                                  |
 |--------------------|--------------------|------------------------------------------------------------------|
 |     patient_id     |     varchar(20)    |     Contains keys that uniquely identifies each patient.         |
@@ -18,7 +18,7 @@
 
 **2. dim_chronic_disease**
 
- ***Content:** Stores the various chronic disease names that patients have. 
+ * **Content:** Stores the various chronic disease names that patients have. 
 |     Column Name        |     Data Type       |     Description                                                         |
 |------------------------|---------------------|-------------------------------------------------------------------------|
 |     patient_id         |     varchar(20)     |     Contains keys that uniquely identifies each patient.                |
@@ -28,7 +28,7 @@
 
 **3. dim_disease**
 
- ***Content:** Stores the information about the diseases that are usually encountered at the medical centre.
+ * **Content:** Stores the information about the diseases that are usually encountered at the medical centre.
 |     Column Name            |     Data Type       |     Description                                          |
 |----------------------------|---------------------|----------------------------------------------------------|
 |     disease_id             |     integer         |     A unique key that identifies each disease.           |
@@ -39,7 +39,7 @@
 
 **4. dim_doctor**
 
- ***Content:** Stores information on the doctors that serve at the medical centre.
+ * **Content:** Stores information on the doctors that serve at the medical centre.
 |     Column Name         |     Data Type      |     Description                                                       |
 |-------------------------|--------------------|-----------------------------------------------------------------------|
 |     doctor_id           |     integer        |     A unique key that identifies a doctor.                            |
@@ -52,15 +52,15 @@
 
 **5. dim_encounter_additional_service**
 
- ***Content:** Stores information on the additional services that each patient received at the centre.
+ * **Content:** Stores information on the additional services that each patient received at the centre.
 |     Column Name     |     Data Type      |     Description                                                               |
 |---------------------|--------------------|-------------------------------------------------------------------------------|
 |     encounter_id    |     integer        |     A unique identifier that represents a patient’s visit to the centre.      |
 |     service_name    |     varchar(50)    |     Name of the additional service a patient received.                        |
 
-**6.	dim_insurance_details**
+**6. dim_insurance_details**
 
- ***Content:** Stores information on the different insurance packages that patients were covered with.
+ * **Content:** Stores information on the different insurance packages that patients were covered with.
 |     Column Name           |     Data Type       |     Description                                                                                                    |
 |---------------------------|---------------------|--------------------------------------------------------------------------------------------------------------------|
 |     insurance_id          |     integer         |     An id that uniquely represents an insurance package.                                                           |
@@ -68,9 +68,9 @@
 |     extent_of_coverage    |     Decimal(4,2)    |     A decimal representing how much the insurance package partially covers in terms of conditions (illnesses).     |
 |     deductible            |     integer         |     An integer value that is deducted from patients that have subscribed to the package.                           |
 
-**7.	dim_insurance_packages**
+**7. dim_insurance_packages**
 
- ***Content:** Stores information on the conditions that are partially covered by the various insurance packages.
+ * **Content:** Stores information on the conditions that are partially covered by the various insurance packages.
 |     Column Name                     |     Data Type       |     Description                                                                                                                                                          |
 |-------------------------------------|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |     conditions_partially_covered    |     varchar(200)    |     Name of the condition that is partially covered.                                                                                                                     |
@@ -78,9 +78,9 @@
 |     standard                        |     varchar(50)     |     Low cardinality type column containing either ‘yes’, ‘no’ or ‘info absent’. It indicates whether or not the condition is being covered by the   insurance type.      |
 |     premium                         |     varchar(50)     |     Low cardinality type column containing either ‘yes’, ‘no’ or ‘info absent’. It indicates whether or not the condition is being covered by the   insurance type.      |
 
-**8.	dim_patient**
+**8. dim_patient**
 
- ***Content:** Stores personal information about the patients that visited the centre.
+ * **Content:** Stores personal information about the patients that visited the centre.
 |     Column Name       |     Data Type      |     Description                                            |
 |-----------------------|--------------------|------------------------------------------------------------|
 |     patient_id        |     varchar(20)    |     A unique identifier for each patient.                  |
@@ -96,7 +96,7 @@
 
 **9.dim_room**
 
- ***Content:** Stores information on the different rooms provided to the patients at the centre.
+ * **Content:** Stores information on the different rooms provided to the patients at the centre.
 |     Column Name    |     Data Type      |     Description                                                                      |
 |--------------------|--------------------|--------------------------------------------------------------------------------------|
 |     room_id        |     integer        |     A unique identifier for a type of room.                                          |
@@ -105,7 +105,7 @@
 
 **10. fact_cost**
 
- ***Content:** Stores information about the various costs patients incurred at the centre.
+ * **Content:** Stores information about the various costs patients incurred at the centre.
 |     Column Name                     |     Data Type        |     Description                                                                                                    |
 |-------------------------------------|----------------------|--------------------------------------------------------------------------------------------------------------------|
 |     encounter_id                    |     integer          |     A unique identifier that represents a patient’s visit to the centre.                                           |
@@ -129,7 +129,7 @@
 
 **11. fact_encounter**
 
- ***Content:** Stores information about each encounter between a patient and the centre.
+ * **Content:** Stores information about each encounter between a patient and the centre.
 |     Column Name                  |     Data Type        |     Description                                                                          |
 |----------------------------------|----------------------|------------------------------------------------------------------------------------------|
 |     encounter_id                 |     integer          |     A unique identifier that represents a patient’s visit to the centre.                 |
@@ -151,10 +151,10 @@
 
 **12. fact_lab_tests**
 
- ***Content:** Stores information on the lab tests that were conducted on patients.
-  (cbc) – means ‘total blood count’ test
-  (chem) – means chemical test
-  (lipids) – means lipids test 
+ * **Content:** Stores information on the lab tests that were conducted on patients.
+   (cbc) – means ‘total blood count’ test
+   (chem) – means chemical test
+   (lipids) – means lipids test 
 
 |     Column Name                          |     Data Type          |     Description                                                                                                                                                                                                        |
 |------------------------------------------|------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -198,7 +198,7 @@
 
 **13. fact_special_tests**
  
- ***Content:** Stores information on the special tests that were conducted on patients.
+ * **Content:** Stores information on the special tests that were conducted on patients.
 |     Column Name        |     Data Type           |     Description                                                                                              |
 |------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------|
 |     encounter_id       |     integer             |     A unique identifier that represents a patient’s visit to the centre.                                     |
@@ -209,7 +209,7 @@
 
 **14. fact_treatment**
 
- ***Content:** Stores information on the treatments that patients received at the centre.
+ * **Content:** Stores information on the treatments that patients received at the centre.
 |     Column Name                |     Data Type       |     Description                                                                                          |
 |--------------------------------|---------------------|----------------------------------------------------------------------------------------------------------|
 |     encounter_id               |     integer         |     A unique identifier that represents a patient’s visit to the centre.                                 |
@@ -225,7 +225,7 @@
 
 **15. fact_vitals**
 
- ***Content:** Stores information on the vitals of patients.
+ * **Content:** Stores information on the vitals of patients.
 |     Column Name                 |     Data Type        |     Description                                                                                   |
 |---------------------------------|----------------------|---------------------------------------------------------------------------------------------------|
 |     encounter_id                |     integer          |     A unique identifier that represents a patient’s visit to the centre.                          |
