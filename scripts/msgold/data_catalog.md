@@ -2,7 +2,7 @@
 
 **Overview**
 
-* The gold layer is the business-level data representation, structured to support analytical and reporting use cases. It consists of multiple fact and dimension tables for various business metrics.
+* The gold layer is the business-level data representation layer, structured to support analytical and reporting use cases. It consists of multiple fact and dimension tables for various business metrics.
 
 
 
