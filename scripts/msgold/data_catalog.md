@@ -6,6 +6,7 @@
 
 
 
+
 **1. dim_allergy**
 
  * **Content:** Stores the various allergy names that patients have.
@@ -16,6 +17,7 @@
 |     first_name     |     varchar(50)    |     Has patients’ first names.                                   |
 |     last_name      |     varchar(50)    |     Has patients’ last names.                                    |
 |     allergy        |     varchar(50)    |     Has names of the all the allergies that each patient has.    |
+
 
 
 
@@ -31,6 +33,7 @@
 |     chronic_disease    |     varchar(100)    |     Has names of the all the chronic diseases that each patient has.    |
 
 
+
 **3. dim_disease**
 
  * **Content:** Stores the information about the diseases that are usually encountered at the medical centre.
@@ -42,6 +45,7 @@
 |     disease_type           |     varchar(50)     |     Type of the disease.                                 |
 |     medical_unit           |     varchar(50)     |     The medical unit that addresses the disease.         |
 |     disease_severity       |     integer         |     An integer depicting the severity of the disease.    |
+
 
 
 **4. dim_doctor**
@@ -59,6 +63,7 @@
 |     patients_treated    |     integer        |     Indicated the number of patients the doctor has attended to       |
 
 
+
 **5. dim_encounter_additional_service**
 
  * **Content:** Stores information on the additional services that each patient received at the centre.
@@ -67,6 +72,7 @@
 |---------------------|--------------------|-------------------------------------------------------------------------------|
 |     encounter_id    |     integer        |     A unique identifier that represents a patient’s visit to the centre.      |
 |     service_name    |     varchar(50)    |     Name of the additional service a patient received.                        |
+
 
 
 **6. dim_insurance_details**
@@ -81,6 +87,7 @@
 |     deductible            |     integer         |     An integer value that is deducted from patients that have subscribed to the package.                           |
 
 
+
 **7. dim_insurance_packages**
 
  * **Content:** Stores information on the conditions that are partially covered by the various insurance packages.
@@ -91,6 +98,7 @@
 |     basic                           |     varchar(50)     |     Low cardinality type column containing either ‘yes’, ‘no’ or ‘info absent’. It indicates whether or not the condition is being covered by the   insurance type.      |
 |     standard                        |     varchar(50)     |     Low cardinality type column containing either ‘yes’, ‘no’ or ‘info absent’. It indicates whether or not the condition is being covered by the   insurance type.      |
 |     premium                         |     varchar(50)     |     Low cardinality type column containing either ‘yes’, ‘no’ or ‘info absent’. It indicates whether or not the condition is being covered by the   insurance type.      |
+
 
 
 **8. dim_patient**
@@ -111,6 +119,7 @@
 |     blood_type        |     varchar(10)    |     Indicates the blood group of a patient.                |
 
 
+
 **9.dim_room**
 
  * **Content:** Stores information on the different rooms provided to the patients at the centre.
@@ -120,6 +129,7 @@
 |     room_id        |     integer        |     A unique identifier for a type of room.                                          |
 |     care_level     |     varchar(30)    |     Indicates the level of care a patient receives while staying at the centre.      |
 |     room_type      |     varchar(50)    |     Indicates the type of room a patient receives while staying at the centre.       |
+
 
 
 **10. fact_cost**
@@ -148,6 +158,7 @@
 |     out_of_pocket_cost              |     decimal(23,0)    |     The amount that a patient paid from their own pocket.                                                          |
 
 
+
 **11. fact_encounter**
 
  * **Content:** Stores information about each encounter between a patient and the centre.
@@ -170,6 +181,7 @@
 |     endoscopy_type               |     varchar(50)      |     The type of endoscopy that a patient underwent.                                      |
 |     endoscopy_procedure_count    |     integer          |     The count of endoscopy procedures a patient underwent.                               |
 |     CompanionPresent             |     varchar(3)       |     Indicates if a patient had a companion present during their stay at the centre.      |
+
 
 
 **12. fact_lab_tests**
@@ -220,6 +232,7 @@
 |     crp   (crp)                          |     decimal(5,   1)    |     A decimal that indicates inflammation levels caused by infection, injury, or chronic diseases like arthritis expressed in milligrams per liter.                                                                    |
 
 
+
 **13. fact_special_tests**
  
  * **Content:** Stores information on the special tests that were conducted on patients.
@@ -231,6 +244,7 @@
 |     stage              |     varchar(30)         |     The stage at which the special tests were conducted on a patient. (i.e. at admission or at discharge)    |
 |     test_name          |     varchar(150)        |     Name of the special test conducted.                                                                      |
 |     result             |     decimal(10,   2)    |     An integer that indicates the result of the special test.                                                |
+
 
 
 **14. fact_treatment**
@@ -249,6 +263,7 @@
 |     hospital_drug_quantity     |     integer         |     An integer indicating the number of drugs that a patient used at the centre.                         |
 |     discharge_drug_quantity    |     integer         |     An integer indicating the number of drugs a patient was prescribed with at discharge.                |
 |     total_drug_quantity        |     bigint          |     An integer indicating the total number of drugs a patient was prescribed with.                       |
+
 
 
 **15. fact_vitals**
