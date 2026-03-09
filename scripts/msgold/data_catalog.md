@@ -1,8 +1,3 @@
-/*
-
-
-
-
 **DATA DICTIONARY FOR THE GOLD LAYER**
 
 **Overview**
