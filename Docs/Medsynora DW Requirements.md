@@ -144,11 +144,11 @@ ________________________________________
 
 FactEncounter must:
 
-•	Represent patient encounters
+-	Represent patient encounters
 
-•	Contain foreign keys to all related dimensions
+-	Contain foreign keys to all related dimensions
 
-•	Include measurable metrics such as:
+-	Include measurable metrics such as:
 
  - 	Encounter count
   
