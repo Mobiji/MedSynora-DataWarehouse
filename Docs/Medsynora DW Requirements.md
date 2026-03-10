@@ -24,8 +24,11 @@ ________________________________________
 **2.2 Operational Goals**
 
 •	Standardize metrics and definitions across departments
+
 •	Improve reporting performance and usability
+
 •	Enable consistent time-based analysis
+
 •	Support self-service analytics for analysts and BI users
 ________________________________________
 
