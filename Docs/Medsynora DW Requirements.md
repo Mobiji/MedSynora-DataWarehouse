@@ -11,7 +11,7 @@ ________________________________________
 
 ### **2. Business Goals**
 
-2.1 Strategic Goals
+**2.1 Strategic Goals**
 
 The Data Warehouse initiative is intended to:
 1.	Enable data-driven clinical and operational decisions
@@ -21,7 +21,7 @@ The Data Warehouse initiative is intended to:
 5.	Establish a scalable foundation for future analytics and reporting
 ________________________________________
 
-2.2 Operational Goals
+**2.2 Operational Goals**
 •	Standardize metrics and definitions across departments
 •	Improve reporting performance and usability
 •	Enable consistent time-based analysis
@@ -30,7 +30,7 @@ ________________________________________
 
 ### **3. Project Scope**
 
-3.1 In-Scope
+**3.1 In-Scope**
 •	Integration of all provided MedSynora CSV data sources
 •	Design and implementation of a dimensional data warehouse
 •	Creation of fact and dimension tables
@@ -38,7 +38,7 @@ ________________________________________
 •	Batch-based ETL/ELT processing
 •	Analytical reporting and dashboard enablement
 
-3.2 Out of Scope
+**3.2 Out of Scope**
 •	Real-time or streaming data ingestion
 •	Transactional system replacement
 •	Clinical decision automation
@@ -47,13 +47,13 @@ ________________________________________
 
 ### **4. Stakeholders**
 
-4.1 Business Stakeholders
+**4.1 Business Stakeholders**
 •	Hospital Executive Management
 •	Clinical Leadership
 •	Department Heads
 •	Finance and Operations Teams
 
-4.2 Technical Stakeholders
+**4.2 Technical Stakeholders**
 •	Data Engineering Team
 •	BI & Analytics Team
 •	Data Analysts
@@ -75,45 +75,45 @@ ________________________________________
 
 The EDW must enable analysis to answer questions such as:
 
-Clinical & Patient Analytics
-•	Encounter volumes by disease, chronic condition, and allergy
-•	Average length of stay by diagnosis and department
-•	Disease prevalence and trend analysis
+- Clinical & Patient Analytics
+  •	Encounter volumes by disease, chronic condition, and allergy
+  •	Average length of stay by diagnosis and department
+  •	Disease prevalence and trend analysis
 
-Staffing & Resource Analytics
-•	Doctor workload distribution
-•	Encounters handled per specialty
-•	Staffing trends over time
+- Staffing & Resource Analytics
+  •	Doctor workload distribution
+  •	Encounters handled per specialty
+  •	Staffing trends over time
 
-Service Utilization Analytics
-•	Frequency of additional services
-•	Service usage by disease and doctor
-•	High-utilization service identification
+- Service Utilization Analytics
+  •	Frequency of additional services
+  •	Service usage by disease and doctor
+  •	High-utilization service identification
 
-Time-Based Analytics
-•	Daily, monthly, quarterly, and annual trends
-•	Seasonal disease patterns
-•	Growth and decline in operational metrics
+- Time-Based Analytics
+  •	Daily, monthly, quarterly, and annual trends
+  •	Seasonal disease patterns
+  •	Growth and decline in operational metrics
 ________________________________________
 
 ### **7. Data Architecture Requirements**
 
-7.1 Data Modeling Approach
+**7.1 Data Modeling Approach**
 •	The Data Warehouse must follow a dimensional (star schema) design
 •	Fact tables must represent measurable business events
 •	Dimension tables must provide descriptive context
 •	Bridge tables must resolve many-to-many relationships
 ________________________________________
 
-7.2 Grain Definition
+**7.2 Grain Definition**
 FactEncounter Grain Definition:
-One record per patient encounter per day
-This grain must be strictly enforced to ensure aggregation accuracy and metric consistency.
+- One record per patient encounter per day
+- This grain must be strictly enforced to ensure aggregation accuracy and metric consistency.
 ________________________________________
 
 ### **8. Functional Requirements**
 
-8.1 Fact Tables
+**8.1 Fact Tables**
 
 FactEncounter must:
 •	Represent patient encounters
@@ -124,50 +124,50 @@ FactEncounter must:
   o	Severity indicators (if available)
 ________________________________________
 
-8.2 Dimension Tables
+**8.2 Dimension Tables**
 
-Required Dimensions
-•	Patient
-•	Doctor
-•	Disease
-•	Chronic Disease
-•	Allergy
-•	Additional Service
-•	Date
+- Required Dimensions
+  •	Patient
+  •	Doctor
+  •	Disease
+  •	Chronic Disease
+  •	Allergy
+  •	Additional Service
+  •	Date
 
-Each dimension must:
-•	Use surrogate keys
-•	Support descriptive analytics
-•	Be conformed across all fact tables
+- Each dimension must:
+  •	Use surrogate keys
+  •	Support descriptive analytics
+  •	Be conformed across all fact tables
 ________________________________________
 
-8.3 Bridge Tables
+**8.3 Bridge Tables**
 
-Bridge tables must:
-•	Resolve many-to-many relationships
-•	Prevent double counting
-•	Support correct aggregation logic
+- Bridge tables must:
+  •	Resolve many-to-many relationships
+  •	Prevent double counting
+  •	Support correct aggregation logic
 
-Examples:
-•	Encounter–Doctor
-•	Encounter–Additional Service
+- Examples:
+  •	Encounter–Doctor
+  •	Encounter–Additional Service
 ________________________________________
 
 ### **9. Non-Functional Requirements**
 
-9.1 Performance
+**9.1 Performance**
 •	Standard BI queries must return results within 5–10 seconds
 •	The warehouse must support analytical workloads at scale
 
-9.2 Scalability
+**9.2 Scalability**
 •	The solution must support multi-year historical data
 •	Schema design must allow addition of new dimensions and facts
 
-9.3 Data Refresh
+**9.3 Data Refresh**
 •	Daily batch refresh is required
 •	Full and incremental loads must be supported
 
-9.4 Security & Privacy
+**9.4 Security & Privacy**
 •	Patient data must be anonymized or masked
 •	Access must be role-based where applicable
 ________________________________________
@@ -186,13 +186,13 @@ ________________________________________
 ### **11. Reporting & Analytics Enablement**
 
 The EDW must support:
-a. Standard Analytical Outputs
+**a. Standard Analytical Outputs**
   •	Executive overview dashboards
   •	Clinical performance dashboards
   •	Doctor workload dashboards
   •	Service utilization dashboards
   •	Time-series trend analysis
-b. BI Tool Compatibility
+**b. BI Tool Compatibility**
   •	SQL-based access
   •	Compatibility with Tableau, Power BI, or equivalent tools
 ________________________________________
