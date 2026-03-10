@@ -49,12 +49,6 @@ ________________________________________
 **3.2 Out of Scope**
 
 •	Real-time or streaming data ingestion
-
-•	Transactional system replacement
-
-•	Clinical decision automation
-
-•	Regulatory or compliance reporting
 ________________________________________
 
 ### **4. Stakeholders**
