@@ -173,12 +173,6 @@
 
 **Content:** Stores information on the lab tests that were conducted on patients.
 
-*(cbc)* – means ‘total blood count’ test
-
-*(chem)* – means chemical test
-
-*(lipids)* – means lipids test 
-
 |     Column Name                        |     Data Type          |     Description                                                                                                                                                                                                            |
 |----------------------------------------|------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |     encounter_id                       |     integer            |     A unique identifier that represents a patient’s visit to the centre.                                                                                                                                                   |
