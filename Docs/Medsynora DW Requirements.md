@@ -44,8 +44,6 @@ ________________________________________
 
 •	Support for historical data analysis
 
-•	Batch-based ETL/ELT processing
-
 •	Analytical reporting and dashboard enablement
 
 **3.2 Out of Scope**
