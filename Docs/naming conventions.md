@@ -49,16 +49,16 @@ This document outlines the naming conventions to be used for schemas, tables, vi
 
 *Surrogate Keys* 
 - All primary keys in dimension tables must use the suffix `_key`.
-i.e. <table_name>_key
-  - <table_name>: Refers to the name of the table or entity the key belongs to.  
+i.e. (table_name)_key
+  - (table_name): Refers to the name of the table or entity the key belongs to.  
   - `_key`: A suffix indicating that this column is a surrogate key.  
   - Example: `patient_key` → Surrogate key in the `dim_patients` table.
 
 *Technical Columns (Metadata Columns)*
 - All technical columns must start with the prefix `dwh_`, followed by a descriptive name indicating the column's purpose.
--i.e. dwh_<column_name>
+-i.e. dwh_(column_name)
   - `dwh_`: Prefix exclusively for system-generated metadata.  
-  - <column_name>: Descriptive name indicating the column's purpose.  
+  - (column_name): Descriptive name indicating the column's purpose.  
   - Example: `dwh_load_date` → System-generated column used to store the date when a record is loaded.
     
 *Other generated Columns (Other than metadata)*
