@@ -1,4 +1,4 @@
-# **MEDSYNORA DATAWAREHOUSE NAMING CONVENTIONS**
+## **MEDSYNORA DATAWAREHOUSE NAMING CONVENTIONS**
 
 - This document outlines the naming conventions to be used for schemas, tables, views, columns, and other objects in the data warehouse.
 
