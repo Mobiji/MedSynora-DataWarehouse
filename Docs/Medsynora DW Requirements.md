@@ -172,39 +172,16 @@ ________________________________________
   •	Allergy
   
   •	Additional Service
-  
-  •	Date
 
 - Each dimension must:
   
-  •	Use surrogate keys
-  
   •	Support descriptive analytics
-  
-  •	Be conformed across all fact tables
-________________________________________
-
-**8.3 Bridge Tables**
-
-- Bridge tables must:
-  
-  •	Resolve many-to-many relationships
-  
-  •	Prevent double counting
-  
-  •	Support correct aggregation logic
-
-- Examples:
-  
-  •	Encounter–Doctor
-  
-  •	Encounter–Additional Service
 ________________________________________
 
 ### **9. Non-Functional Requirements**
 
 **9.1 Performance**
-•	Standard BI queries must return results within 5–10 seconds
+•	Standard BI queries must return results within 5–60 seconds
 
 •	The warehouse must support analytical workloads at scale
 
@@ -217,11 +194,6 @@ ________________________________________
 •	Daily batch refresh is required
 
 •	Full and incremental loads must be supported
-
-**9.4 Security & Privacy**
-•	Patient data must be anonymized or masked
-
-•	Access must be role-based where applicable
 ________________________________________
 
 
@@ -234,10 +206,6 @@ The Data Warehouse must enforce:
 •	Valid date logic (e.g., admission date ≤ discharge date)
 
 •	Deduplication of encounters
-
-•	Standardized categorical values
-
-•	Defined handling of null and missing values
 ________________________________________
 
 ### **11. Reporting & Analytics Enablement**
@@ -269,11 +237,10 @@ The Data Warehouse solution will be considered successfully delivered when:
 
 1.	All source CSV data is integrated into the EDW
 2.	Fact and dimension tables align with defined business processes
-3.	Metrics are consistent across all reports
-4.	Historical analysis across multiple years is possible
-5.	BI dashboards can be built without referencing raw CSV files
-6.	Query performance meets defined thresholds
-7.	Data quality rules are enforced and validated
+3.	Historical analysis across multiple years is possible
+4.	BI dashboards can be built without referencing raw CSV files
+5.	Query performance meets defined thresholds
+6.	Data quality rules are enforced.
 ________________________________________
 
 ### **13. Success Metrics**
@@ -286,14 +253,3 @@ ________________________________________
 
 •	Ability to answer business questions previously not feasible
 ________________________________________
-
-### **14. Assumptions & Constraints**
-
-•	Data is synthetic and used for analytical purposes only
-
-•	The warehouse is analytical, not operational
-
-•	Star schema is the preferred modeling approach
-
-•	No real-time SLAs are required
-
