@@ -6,7 +6,7 @@ ________________________________________
 ### **1. Executive Summary**
 
 MedSynora operates a multi-department healthcare facility that provides inpatient and outpatient medical services. MedSynora seeks to design and implement a centralized Enterprise Data Warehouse (EDW) in MySQL to consolidate clinical and operational healthcare data currently stored across multiple flat-file sources. The objective is to enable reliable, scalable, and performant analytical reporting to support clinical decision-making, operational optimization, and executive oversight.
-The Data Warehouse will serve as the single source of truth for historical healthcare analytics and will be optimized for BI and advanced analytical workloads.
+The Data Warehouse will serve as the **single source of truth** for historical healthcare analytics and will be optimized for BI and advanced analytical workloads.
 ________________________________________
 
 ### **2. Business Goals**
