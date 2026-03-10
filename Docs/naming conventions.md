@@ -23,24 +23,24 @@ This document outlines the naming conventions to be used for schemas, tables, vi
 *Bronze Rules*
 - All names must start with the source system name, and table names must match their original names without renaming.
 - (sourcesystem)_(entity) 
-  - <sourcesystem>: Name of the source system (e.g. crm, erp).  
-  - <entity>: Exact table name from the source system.  
+  - (sourcesystem): Name of the source system (e.g. crm, erp).  
+  - (entity): Exact table name from the source system.  
   - Example: `erp_patients` → Patient information from the ERP system.
 
 
 *Silver Rules*
 - All names must start with the source system name, and table names must match their original names without renaming.
 - (sourcesystem)_(entity)  
-  	- <sourcesystem>: Name of the source system (e.g., crm, erp).  
-  	- <entity>: Exact table name from the source system.  
+  	- (sourcesystem): Name of the source system (e.g., crm, erp).  
+  	- (entity): Exact table name from the source system.  
   	- Example: `erp_patients` → Patient information from the ERP system.
  
 
 *Gold Rules*
 - All names must use meaningful, business-aligned names for tables, starting with the category prefix.
 - (category)_(entity)
-  - <category>: Describes the role of the table, such as `dim` for (dimension), `rep` for (report) or `fact` for (fact table).  
-  - <entity>: Descriptive name of the table, aligned with the business domain (e.g., `patients`, `doctors`, `tests`).  
+  - (category): Describes the role of the table, such as `dim` for (dimension), `rep` for (report) or `fact` for (fact table).  
+  - (entity): Descriptive name of the table, aligned with the business domain (e.g., `patients`, `doctors`, `tests`).  
   - Examples:
     - `dim_patients` → Dimension table for patient data.  
     - `fact_tests` → Fact table containing tests record data.  
