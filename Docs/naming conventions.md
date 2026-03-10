@@ -28,7 +28,6 @@ This document outlines the naming conventions to be used for schemas, tables, vi
   - Example: `erp_patients` → Patient information from the ERP system.
 
 
-
 *Silver Rules*
 - All names must start with the source system name, and table names must match their original names without renaming.
 - <sourcesystem>_<entity>  
