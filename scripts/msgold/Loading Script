@@ -1,9 +1,9 @@
 /*
 =======================================================================================================================================================================
-		LOADING THE GOLD LAYER (msgold)
+		CREATING AND LOADING THE GOLD LAYER (msgold)
 =======================================================================================================================================================================
 Script Purpose:
-    * The query block is made up of a stored procedure that is responsible for loading the gold layer with end user ready data.
+    * The query block is made up of a stored procedure that is responsible for creating and loading the gold layer with end user ready data.
     * The objects in the gold layer are views.
 	* The stored procedure performs the ETL (Extract, Transform & Load) process to populate the gold layer with data that is ready for analysis or ad-hoc queries.
 	* For each view, I have used the 'create or replace view' statement in order to replace the view's content everytime the stored procedure is invoked.
