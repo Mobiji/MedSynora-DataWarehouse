@@ -22,6 +22,7 @@ The Data Warehouse's initiative is to:
 ________________________________________
 
 **2.2 Operational Goals**
+
 •	Standardize metrics and definitions across departments
 •	Improve reporting performance and usability
 •	Enable consistent time-based analysis
@@ -31,6 +32,7 @@ ________________________________________
 ### **3. Project Scope**
 
 **3.1 In-Scope**
+
 •	Integration of all provided MedSynora CSV data sources
 •	Design and implementation of a dimensional data warehouse
 •	Creation of fact and dimension tables
@@ -39,6 +41,7 @@ ________________________________________
 •	Analytical reporting and dashboard enablement
 
 **3.2 Out of Scope**
+
 •	Real-time or streaming data ingestion
 •	Transactional system replacement
 •	Clinical decision automation
@@ -48,12 +51,14 @@ ________________________________________
 ### **4. Stakeholders**
 
 **4.1 Business Stakeholders**
+
 •	Hospital Executive Management
 •	Clinical Leadership
 •	Department Heads
 •	Finance and Operations Teams
 
 **4.2 Technical Stakeholders**
+
 •	Data Engineering Team
 •	BI & Analytics Team
 •	Data Analysts
@@ -76,21 +81,25 @@ ________________________________________
 The EDW must enable analysis to answer questions such as:
 
 - Clinical & Patient Analytics
+
   •	Encounter volumes by disease, chronic condition, and allergy
   •	Average length of stay by diagnosis and department
   •	Disease prevalence and trend analysis
 
 - Staffing & Resource Analytics
+  
   •	Doctor workload distribution
   •	Encounters handled per specialty
   •	Staffing trends over time
 
 - Service Utilization Analytics
+  
   •	Frequency of additional services
   •	Service usage by disease and doctor
   •	High-utilization service identification
 
 - Time-Based Analytics
+  
   •	Daily, monthly, quarterly, and annual trends
   •	Seasonal disease patterns
   •	Growth and decline in operational metrics
@@ -99,6 +108,7 @@ ________________________________________
 ### **7. Data Architecture Requirements**
 
 **7.1 Data Modeling Approach**
+
 •	The Data Warehouse must follow a dimensional (star schema) design
 •	Fact tables must represent measurable business events
 •	Dimension tables must provide descriptive context
@@ -106,6 +116,7 @@ ________________________________________
 ________________________________________
 
 **7.2 Grain Definition**
+
 FactEncounter Grain Definition:
 - One record per patient encounter per day
 - This grain must be strictly enforced to ensure aggregation accuracy and metric consistency.
