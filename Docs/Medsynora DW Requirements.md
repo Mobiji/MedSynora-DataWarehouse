@@ -160,6 +160,7 @@ ________________________________________
 **8.2 Dimension Tables**
 
 - Required Dimensions
+  
   •	Patient
 
   •	Doctor
@@ -175,6 +176,7 @@ ________________________________________
   •	Date
 
 - Each dimension must:
+  
   •	Use surrogate keys
   
   •	Support descriptive analytics
@@ -185,6 +187,7 @@ ________________________________________
 **8.3 Bridge Tables**
 
 - Bridge tables must:
+  
   •	Resolve many-to-many relationships
   
   •	Prevent double counting
@@ -192,6 +195,7 @@ ________________________________________
   •	Support correct aggregation logic
 
 - Examples:
+  
   •	Encounter–Doctor
   
   •	Encounter–Additional Service
@@ -224,6 +228,7 @@ ________________________________________
 ### **10. Data Quality & Governance Requirements**
 
 The Data Warehouse must enforce:
+
 •	Referential integrity across all tables
 
 •	Valid date logic (e.g., admission date ≤ discharge date)
@@ -238,7 +243,9 @@ ________________________________________
 ### **11. Reporting & Analytics Enablement**
 
 The EDW must support:
+
 **a. Standard Analytical Outputs**
+
   •	Executive overview dashboards
   
   •	Clinical performance dashboards
@@ -259,6 +266,7 @@ ________________________________________
 ### **12. Acceptance Criteria**
 
 The Data Warehouse solution will be considered successfully delivered when:
+
 1.	All source CSV data is integrated into the EDW
 2.	Fact and dimension tables align with defined business processes
 3.	Metrics are consistent across all reports
@@ -269,6 +277,7 @@ The Data Warehouse solution will be considered successfully delivered when:
 ________________________________________
 
 ### **13. Success Metrics**
+
 •	Reduction in time spent preparing analytical datasets
 
 •	Increased consistency in reported metrics
@@ -279,6 +288,7 @@ ________________________________________
 ________________________________________
 
 ### **14. Assumptions & Constraints**
+
 •	Data is synthetic and used for analytical purposes only
 
 •	The warehouse is analytical, not operational
