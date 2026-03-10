@@ -6,7 +6,7 @@
 
 **1. dim_allergy**
 
-*8Content:** Stores the various allergy names that patients have. 
+**Content:** Stores the various allergy names that patients have. 
 
 |     Column Name    |     Data Type      |     Description                                                  |
 |--------------------|--------------------|------------------------------------------------------------------|
