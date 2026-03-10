@@ -61,10 +61,10 @@ i.e. <table_name>_key
   - Example: `dwh_load_date` → System-generated column used to store the date when a record is loaded.
 
 *Other generated Columns (Other than metadata)*
-All columns derived from the original data in a table shall have the prefix ‘der_’ followed by a descriptive name that indicated the column’s purpose.
-i.e. der_CheckinTime
-	‘der_’: Prefix exclusively for derived data columns
-	 ‘CheckinTime’: Descriptive name indicating the column’s purpose.
+- All columns derived from the original data in a table shall have the prefix ‘der_’ followed by a descriptive name that indicated the column’s purpose.
+- i.e. der_CheckinTime
+	- ‘der_’: Prefix exclusively for derived data columns
+	- ‘CheckinTime’: Descriptive name indicating the column’s purpose.
 
 ### **4. Stored Procedure**
 - All stored procedures used for creating tables must follow the naming pattern:
