@@ -134,7 +134,7 @@ ________________________________________
 **7.2 Grain Definition**
 
 FactEncounter Grain Definition:
-- One record per patient encounter per day
+- One record per patient encounter
 - This grain must be strictly enforced to ensure aggregation accuracy and metric consistency.
 ________________________________________
 
