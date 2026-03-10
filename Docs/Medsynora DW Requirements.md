@@ -143,13 +143,17 @@ ________________________________________
 **8.1 Fact Tables**
 
 FactEncounter must:
+
 •	Represent patient encounters
 
 •	Contain foreign keys to all related dimensions
 
 •	Include measurable metrics such as:
+
   o	Encounter count
+  
   o	Length of stay
+  
   o	Severity indicators (if available)
 ________________________________________
 
