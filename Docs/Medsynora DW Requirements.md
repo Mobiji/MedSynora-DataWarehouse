@@ -129,8 +129,6 @@ ________________________________________
 •	Fact tables must represent measurable business events
 
 •	Dimension tables must provide descriptive context
-
-•	Bridge tables must resolve many-to-many relationships
 ________________________________________
 
 **7.2 Grain Definition**
