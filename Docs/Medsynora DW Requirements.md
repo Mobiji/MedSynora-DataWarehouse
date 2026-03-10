@@ -13,7 +13,7 @@ ________________________________________
 
 **2.1 Strategic Goals**
 
-The Data Warehouse initiative is intended to:
+The Data Warehouse's initiative is to:
 1.	Enable data-driven clinical and operational decisions
 2.	Improve visibility into patient encounters, diagnoses, and services
 3.	Support trend, seasonal, and historical analysis
