@@ -1,8 +1,8 @@
-**MEDSYNORA DATAWAREHOUSE NAMING CONVENTIONS**
+# **MEDSYNORA DATAWAREHOUSE NAMING CONVENTIONS**
 
 - This document outlines the naming conventions to be used for schemas, tables, views, columns, and other objects in the data warehouse.
 
-**Table of Contents**
+## **Table of Contents**
 1. General Principles
 2. Table Naming Conventions
    - Bronze Rules
@@ -13,12 +13,12 @@
    - Technical Columns
 4. Stored Procedure
 
-**1. General Principles**
+### **1. General Principles**
 - Naming Conventions: Use snake_case, where an underscore separates 2 words with lowercase letters for all letters.
 - Language: Use English for all names.
 - Avoid Reserved Words: Do not use SQL reserved words as object names.
 
-**2. Table Naming Conventions**
+### **2. Table Naming Conventions**
 
 *Bronze Rules*
 - All names must start with the source system name, and table names must match their original names without renaming.
@@ -43,7 +43,7 @@
     - `dim_patients` → Dimension table for patient data.  
     - `fact_tests` → Fact table containing tests record data.  
 
-**3. Column Naming Conventions**
+### **3. Column Naming Conventions**
 
 *Surrogate Keys*
 
@@ -66,7 +66,7 @@ i.e. der_CheckinTime
 	‘der_’: Prefix exclusively for derived data columns
 	 ‘CheckinTime’: Descriptive name indicating the column’s purpose.
 
-**4. Stored Procedure**
+### **4. Stored Procedure**
 - All stored procedures used for creating tables must follow the naming pattern:
 - `create_<layer>`
   - <layer>: Represents the layer being created, such as `bronze`, `silver`, or `gold`.
