@@ -150,11 +150,11 @@ FactEncounter must:
 
 •	Include measurable metrics such as:
 
-  o	Encounter count
+ - 	Encounter count
   
-  o	Length of stay
+ - 	Length of stay
   
-  o	Severity indicators (if available)
+ - 	Severity indicators (if available)
 ________________________________________
 
 **8.2 Dimension Tables**
