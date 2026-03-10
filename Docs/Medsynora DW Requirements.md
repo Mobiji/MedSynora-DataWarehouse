@@ -69,8 +69,6 @@ ________________________________________
 
 •	BI & Analytics Team
 
-•	Data Analysts
-
 •	Data Science Team (future)
 ________________________________________
 
