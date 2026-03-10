@@ -11,6 +11,7 @@
 3. Column Naming Conventions
    - Surrogate Keys
    - Technical Columns
+   - Other generated columns
 4. Stored Procedure
 
 ### **1. General Principles**
