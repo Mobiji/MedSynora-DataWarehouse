@@ -6,6 +6,7 @@ The MedSynora Data Warehouse project demonstrates the design and implementation 
 The objective of the project is to transform raw operational healthcare data into a structured analytical data warehouse that supports business intelligence and data-driven decision making.
 
 The system integrates data from multiple operational datasets, performs transformation and cleaning processes, and loads the results into a dimensional data warehouse model optimized for analytical queries.
+
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ### Business Problem
