@@ -91,5 +91,88 @@ Data cleaning and transformations are applied:
 Cleaned data is loaded into the dimensional warehouse tables.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Repository Structure
 
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Technologies Used
+
+- SQL
+
+- MySQL
+
+- Data Warehousing
+
+- Dimensional Modeling
+
+- ETL Pipelines
+
+- Git & GitHub
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Key Skills Demonstrated
+
+This project demonstrates the following data engineering and analytics skills:
+
+- Data warehouse design
+
+- Star schema modeling
+
+- SQL data transformations
+
+- ETL pipeline development
+
+- Data cleaning and standardization
+
+- Analytical data preparation
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Future Improvements
+
+Possible future enhancements include:
+
+- Integration with BI tools such as Tableau or Power BI
+
+- Automated ETL pipelines
+
+- Data quality monitoring
+
+- Data warehouse performance optimization
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Author
+
+#### Djiby Amadou
+
+I am a professional transitioning from a background in pharmaceutical manufacturing into the data field, with a focus on data analytics and data engineering.
+
+Through hands-on projects such as the MedSynora Data Warehouse, I am developing practical skills in:
+
+- Data Warehousing
+
+- SQL & Data Transformation
+
+- ETL Pipeline Development
+
+- Data Modeling (Star Schema)
+
+- Analytical Data Preparation
+
+My goal is to leverage my industry experience in pharmaceutical operations together with data engineering and analytics skills to build data-driven solutions that support business intelligence and operational decision-making.
+
+**Career Focus**
+
+- Data Analyst
+
+- Data Engineer (long-term goal)
+
+**Connect With Me**
+
+GitHub: https://github.com/Mobiji
+
+LinkedIn: (add your LinkedIn here if you want)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
