@@ -24,7 +24,7 @@ This project addresses this challenge by:
 - Enabling analytical insights for reporting and decision support
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-### Project Architecture
+### 🏗️ Project Architecture
 
 <img width="821" height="491" alt="Data Architecture" src="https://github.com/user-attachments/assets/8d1d95c9-4d71-418b-bfbc-6cde4a0fff83" />
 
@@ -143,7 +143,7 @@ Possible future enhancements include:
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-### Author
+### 🌟 Author
 
 #### Djiby Amadou
 
@@ -169,10 +169,10 @@ My goal is to leverage my industry experience in pharmaceutical manufacturing op
 
 - Data Engineer (long-term goal)
 
-**Connect With Me**
+**☕ Connect With Me**
 
 GitHub: https://github.com/Mobiji
 
-LinkedIn: (add your LinkedIn here if you want)
+LinkedIn: [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/djiby-amadou-b917a2231/)
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
