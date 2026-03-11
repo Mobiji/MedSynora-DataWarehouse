@@ -93,6 +93,28 @@ Cleaned data is loaded into the dimensional warehouse tables.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Repository Structure
 
+MedSynora-DataWarehouse
+│
+├── datasets
+│
+├── staging
+│   └── staging_tables.sql
+│
+├── transformations
+│   └── cleaning_queries.sql
+│
+├── warehouse
+│   ├── dimension_tables.sql
+│   └── fact_tables.sql
+│
+├── analytics
+│   └── analysis_queries.sql
+│
+├── docs
+│   ├── architecture.png
+│   └── erd.png
+│
+└── README.md
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Technologies Used
@@ -115,7 +137,7 @@ Cleaned data is loaded into the dimensional warehouse tables.
 
 This project demonstrates the following data engineering and analytics skills:
 
-- Data warehouse design
+- Data warehousing
 
 - Star schema modeling
 
@@ -126,6 +148,8 @@ This project demonstrates the following data engineering and analytics skills:
 - Data cleaning and standardization
 
 - Analytical data preparation
+
+- Version control and project organization in GitHub
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
