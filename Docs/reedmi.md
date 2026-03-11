@@ -23,4 +23,34 @@ This project addresses this challenge by:
 
 <img width="821" height="491" alt="Data Architecture" src="https://github.com/user-attachments/assets/8d1d95c9-4d71-418b-bfbc-6cde4a0fff83" />
 
+### Data Warehouse Design
 
+The warehouse follows a **star schema** architecture.
+
+**Fact Tables**
+
+Contain measurable business metrics.
+
+Example:
+
+- Patient treatments
+
+- Medical transactions
+
+- Healthcare services
+
+**Dimension Tables**
+
+Provide descriptive attributes for analysis.
+
+Examples:
+
+- Patient dimension
+
+- Doctor dimension
+
+- Hospital dimension
+
+- Date dimension
+
+This structure enables efficient analytical queries.
