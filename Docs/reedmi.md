@@ -161,7 +161,7 @@ Through hands-on projects such as the MedSynora Data Warehouse, I am developing 
 
 - Analytical Data Preparation
 
-My goal is to leverage my industry experience in pharmaceutical operations together with data engineering and analytics skills to build data-driven solutions that support business intelligence and operational decision-making.
+My goal is to leverage my industry experience in pharmaceutical manufacturing operations together with data engineering and analytics skills to build data-driven solutions that support business intelligence and operational decision-making.
 
 **Career Focus**
 
