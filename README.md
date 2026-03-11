@@ -1,61 +1,192 @@
-# **MedSynora Data Warehouse & Analytics Project**
-Welcome to the MedSynora Data Warehouse and Analytics Project repository! 🚀
+# **MedSynora Data Warehouse**
+### Project Overview
 
-This project demonstrates a comprehensive data warehousing and analytics solution, from building a data warehouse to generating actionable insights. It is designed as a portfolio project, it highlights industry best practices in data engineering and analytics.
+The MedSynora Data Warehouse project demonstrates the design and implementation of an end-to-end data warehousing solution for healthcare analytics.
 
-**🏗️ Data Architecture**
-The data architecture for this project follows Medallion Architecture Bronze, Silver, and Gold layers:
-- Bronze Layer: Stores raw data as-is from the source systems. Data is ingested from CSV Files into SQL Server Database.
-- Silver Layer: This layer includes data cleansing, standardization, and normalization processes to prepare data for analysis.
-- Gold Layer: Houses business-ready data modeled into a star schema required for reporting and analytics.
+The objective of the project is to transform raw operational healthcare data into a structured analytical data warehouse that supports business intelligence and data-driven decision making.
 
-**📖 Project Overview**
-This project involves:
+The system integrates data from multiple operational datasets, performs transformation and cleaning processes, and loads the results into a dimensional data warehouse model optimized for analytical queries.
 
-- Data Architecture: Designing a Modern Data Warehouse Using Medallion Architecture Bronze, Silver, and Gold layers.
-- ETL Pipelines: Extracting, transforming, and loading data from source systems into the warehouse.
-- Data Modeling: Developing fact and dimension tables optimized for analytical queries.
-- Analytics & Reporting: Creating SQL-based reports and dashboards for actionable insights.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## **🚀 Project Requirements**
+### Business Problem
 
-### Building the Data Warehouse (Data Engineering)
+Healthcare organizations generate large volumes of operational data that are often stored across multiple systems. This data is difficult to analyze directly for strategic decision-making.
 
-Objective: Develop a modern data warehouse using MySQL to consolidate data, enabling analytical reporting and informed decision-making.
+This project addresses this challenge by:
 
-Specifications:
+- Integrating multiple healthcare datasets
 
-1. Data Sources: Import data from the ERP source systems provided as CSV files.
-2. Data Quality: Cleanse and resolve data quality issues prior to analysis.
-3. Integration: Combine the various CSV files into a single, user-friendly data model designed for analytical queries.
-4. Documentation: Provide clear documentation of the data model to support both business stakeholders and analytics teams.
+- Cleaning and standardizing raw data
 
-### BI: Analytics & Reporting (Data Analysis)
+- Designing a dimensional data warehouse
 
-Objective: Develop SQL-based analytics to deliver detailed insights into:
+- Enabling analytical insights for reporting and decision support
 
-1. Patient Treatment Patterns
-2. Staffing Resources
-3. Service Utilization
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### 🏗️ Project Architecture
 
-These insights empower stakeholders with key business metrics, enabling strategic decision-making.
+<img width="821" height="491" alt="Data Architecture" src="https://github.com/user-attachments/assets/8d1d95c9-4d71-418b-bfbc-6cde4a0fff83" />
 
-## **☕ Stay Connected**
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Let's stay in touch! Feel free to connect with me on the following platforms:
+### Data Warehouse Design
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/djiby-amadou-b917a2231/)
+The warehouse follows a **star schema** architecture.
 
-## **🛡️ License**
+**Fact Tables**
 
-This project is licensed under the MIT License. You are free to use, modify, and share this project with proper attribution.
+Contain measurable business metrics.
+
+Example:
+
+- Patient treatments
+
+- Medical transactions
+
+- Healthcare services
+
+**Dimension Tables**
+
+Provide descriptive attributes for analysis.
+
+Examples:
+
+- Patient dimension
+
+- Doctor dimension
+
+- Insurance dimension
+
+- Room dimension
+
+- Disease dimension 
+
+This structure enables efficient analytical queries.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### ETL Pipeline
+
+The ETL process consists of the following stages:
+
+**1. Extract**
+
+Raw healthcare datasets are imported into the bronze layer (staging environment).
+
+**2. Transform**
+
+Data cleaning and transformations are applied:
+
+- Handling of missing values
+
+- Standardizing categorical values
+
+- Data normalization
+
+- Data enrichment
+
+**3. Load**
+
+Cleaned data is loaded into the dimensional warehouse tables.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Repository Structure
+
+- docs
+  
+- scripts
+  
+- license
+  
+- README.md
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Technologies Used
+
+- SQL
+
+- MySQL
+
+- Data Warehousing
+
+- Dimensional Modeling
+
+- ETL Pipelines
+
+- Git & GitHub
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Key Skills Demonstrated
+
+This project demonstrates the following data engineering and analytics skills:
+
+- Data warehousing
+
+- Star schema modeling
+
+- SQL data transformations
+
+- ETL pipeline development
+
+- Data cleaning and standardization
+
+- Analytical data preparation
+
+- Version control and project organization in GitHub
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Future Improvements
+
+Possible future enhancements include:
+
+- Integration with BI tools such as Tableau or Power BI
+
+- Automated ETL pipelines
+
+- Data quality monitoring
+
+- Data warehouse performance optimization
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### 🌟 Author
+
+#### Djiby Amadou
+
+I am a professional transitioning from a background in pharmaceutical manufacturing into the data field, with a focus on data analytics and data engineering.
+
+Through hands-on projects such as the MedSynora Data Warehouse, I am developing practical skills in:
+
+- Data Warehousing
+
+- SQL & Data Transformation
+
+- ETL Pipeline Development
+
+- Data Modeling (Star Schema)
+
+- Analytical Data Preparation
+
+My goal is to leverage my industry experience in pharmaceutical manufacturing operations together with data engineering and analytics skills to build data-driven solutions that support business intelligence and operational decision-making.
+
+This project is part of my journey building real-world data engineering skills through practical implementations.
+
+**Career Focus**
+
+- Data Analyst
+
+- Data Engineer (long-term goal)
+
+**☕ Connect With Me**
+
+GitHub: [![github](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/Mobiji)
+
+LinkedIn:  [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/djiby-amadou-b917a2231/)
 
 
-## **🌟 About Me**
-Hi there! I'm Djiby Amadou, an aspiring data professional and passionate potential data engineer on a mission to learn all there is to know about data acquisition, data transformation and data presentation to help individuals and busines make data driven decisions.
-
-Let's stay in touch! Feel free to connect with me on the following platforms:
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/djiby-amadou-b917a2231/)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
