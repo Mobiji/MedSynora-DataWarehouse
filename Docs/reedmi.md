@@ -95,23 +95,33 @@ Cleaned data is loaded into the dimensional warehouse tables.
 
 MedSynora-DataWarehouse
 │
+
 ├── datasets
 │
+
 ├── staging
+
 │   └── staging_tables.sql
 │
+
 ├── transformations
+
 │   └── cleaning_queries.sql
 │
 ├── warehouse
+
 │   ├── dimension_tables.sql
+
 │   └── fact_tables.sql
 │
 ├── analytics
+
 │   └── analysis_queries.sql
 │
 ├── docs
+
 │   ├── architecture.png
+
 │   └── erd.png
 │
 └── README.md
