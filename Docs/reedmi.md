@@ -1,4 +1,4 @@
-# MedSynora Data Warehouse
+# **MedSynora Data Warehouse**
 ### Project Overview
 
 The MedSynora Data Warehouse project demonstrates the design and implementation of an end-to-end data warehousing solution for healthcare analytics.
