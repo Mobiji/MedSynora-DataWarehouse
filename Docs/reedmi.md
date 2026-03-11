@@ -6,6 +6,7 @@ The MedSynora Data Warehouse project demonstrates the design and implementation 
 The objective of the project is to transform raw operational healthcare data into a structured analytical data warehouse that supports business intelligence and data-driven decision making.
 
 The system integrates data from multiple operational datasets, performs transformation and cleaning processes, and loads the results into a dimensional data warehouse model optimized for analytical queries.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ### Business Problem
 
@@ -49,8 +50,34 @@ Examples:
 
 - Doctor dimension
 
-- Hospital dimension
+- Insurance dimension
 
-- Date dimension
+- Room dimension
+
+- Disease dimension 
 
 This structure enables efficient analytical queries.
+
+### ETL Pipeline
+
+The ETL process consists of the following stages:
+
+**1. Extract**
+
+Raw healthcare datasets are imported into the bronze layer (staging environment).
+
+**2. Transform**
+
+Data cleaning and transformations are applied:
+
+- Handling of missing values
+
+- Standardizing categorical values
+
+- Data normalization
+
+- Data enrichment
+
+**3. Load**
+
+Cleaned data is loaded into the dimensional warehouse tables.
