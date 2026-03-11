@@ -163,6 +163,8 @@ Through hands-on projects such as the MedSynora Data Warehouse, I am developing 
 
 My goal is to leverage my industry experience in pharmaceutical manufacturing operations together with data engineering and analytics skills to build data-driven solutions that support business intelligence and operational decision-making.
 
+This project is part of my journey building real-world data engineering skills through practical implementations.
+
 **Career Focus**
 
 - Data Analyst
