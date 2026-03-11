@@ -171,8 +171,7 @@ My goal is to leverage my industry experience in pharmaceutical manufacturing op
 
 **☕ Connect With Me**
 
-GitHub: https://github.com/Mobiji
-[![github](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/Mobiji)
+GitHub: [![github](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/Mobiji)
 
 LinkedIn:  [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/djiby-amadou-b917a2231/)
 
