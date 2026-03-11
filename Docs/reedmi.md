@@ -20,3 +20,7 @@ This project addresses this challenge by:
 - Designing a dimensional data warehouse
 
 - Enabling analytical insights for reporting and decision support
+
+<img width="821" height="491" alt="Data Architecture" src="https://github.com/user-attachments/assets/8d1d95c9-4d71-418b-bfbc-6cde4a0fff83" />
+
+
