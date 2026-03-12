@@ -181,16 +181,19 @@ ________________________________________
 ### **9. Non-Functional Requirements**
 
 **9.1 Performance**
+
 •	Standard BI queries must return results within 5–60 seconds
 
 •	The warehouse must support analytical workloads at scale
 
 **9.2 Scalability**
+
 •	The solution must support multi-year historical data
 
 •	Schema design must allow addition of new dimensions and facts
 
 **9.3 Data Refresh**
+
 •	Daily batch refresh is required
 
 •	Full and incremental loads must be supported
